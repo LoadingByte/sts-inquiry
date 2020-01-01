@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="style.css") }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="stw.css") }}"/>
+  <link rel="icon" type="image/png" href="{{ url_for("static", filename="favicon.png") }}"/>
+  <script src="{{ url_for("static", filename="script.js") }}"></script>
+  <title>StellwerkSim Inquiry</title>
+</head>
+<body>
+
+<header>
+  <h1>StellwerkSim Inquiry</h1>
+  <p>
+    Die leistungsstarke Stellwerksuche für den
+    <a href="https://www.stellwerksim.de" target="_blank">StellwerkSim</a>.
+  </p>
+</header>
+
+{% macro stw_core_box(stw) %}
+  <a href="https://www.stellwerksim.de/anlagen.php?beta=on#stellwerk={{ stw.aid }}" target="_blank">{{ stw.name }}</a>
+  <div class="stw-player-marker-wrapper">
+    <div class="stw-player-marker" style="{{ "visibility: hidden" if not stw.occupants[0] }}"></div>
+    <div class="stw-player-marker" style="{{ "visibility: hidden" if not stw.occupants[1] }}"></div>
+  </div>
+{% endmacro %}
+
+{% macro stw_with_tooltip(stw, style) %}
+  <div class="stw" style="{{ style }}">
+    {{ stw_core_box(stw) }}
+    <div class="stw-tooltip-wrapper">
+      <div class="stw-tooltip">
+        <a class="stw-tooltip-pic" href="{{ stw.screenshot_url }}" target="_blank"
+           title="Größeres Bild anzeigen">
+          <img src="{{ stw.screenshot_url }}" alt="Screenshot des Stellwerks"/>
+        </a>
+        {% if stw.latitude is not none and stw.longitude is not none %}
+          <div class="stw-tooltip-map-placeholder">
+            {# As soon as the user activates the tooltip, an iframe with this source URL will be created.
+               It will have the class "stw-tooltip-map". #}
+            {% set zoom = 0.01 %}
+            https://www.openstreetmap.org/export/embed.html?bbox={{ stw.longitude - zoom }}%2C{{ stw.latitude - zoom }}%2C{{ stw.longitude + zoom }}%2C{{ stw.latitude + zoom }}
+          </div>
+          <a class="stw-tooltip-map-link" target="_blank"
+             href="https://www.openrailwaymap.org/?lat={{ stw.latitude }}&lon={{ stw.longitude }}&zoom=15&style=standard">
+            Größere Karte anzeigen
+          </a>
+        {% endif %}
+        <div class="stw-tooltip-num-labels">Schwierigkeitsgrad:<br/>Unterhaltungsfaktor:</div>
+        <div class="stw-tooltip-nums">
+          {{ stw.difficulty or "&ndash;"|safe }}<br/>
+          {{ stw.entertainment or "&ndash;"|safe }}
+        </div>
+        <div class="stw-tooltip-comment-wrapper">
+          {% for comment in stw.comments %}
+            <div class="stw-tooltip-comment">
+              {{ comment.text }}
+              <div>({{ comment.playing_time }})</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
+<main>
+  <div class="form-wrapper">
+    <form method="get">
+      <div class="form-clsz" style="grid-area: clsz">
+        {{ form.clustersize.label }}
+        {{ form.clustersize }}
+      </div>
+      <div class="form-name" style="grid-area: name">
+        {{ form.name.label }}
+        {{ form.name }}
+      </div>
+      <div class="form-free" style="grid-area: free">
+        {{ form.free() }}
+        {{ form.free.label() }}
+      </div>
+
+      <div class="form-regions" style="grid-area: regions">
+        {{ form.regions.label }}
+        {{ form.regions }}
+      </div>
+
+      <div class="form-sort" style="grid-area: sort">
+        <span>Sortierung</span>
+        <div>
+          {{ form.sortby1.label(style="grid-area: label-1") }}
+          {{ form.sortby2.label(style="grid-area: label-2") }}
+          {{ form.sortby3.label(style="grid-area: label-3") }}
+          {{ form.sortby1(style="grid-area: field-1") }}
+          {{ form.sortby2(style="grid-area: field-2") }}
+          {{ form.sortby3(style="grid-area: field-3") }}
+        </div>
+      </div>
+
+      {{ form.submit(style="grid-area: submit") }}
+    </form>
+  </div>
+
+  <p>
+    {% if n_total_rows != rows|length %}
+      Es werden die ersten {{ rows|length }} von insgesamt {{ n_total_rows }} Ergebnissen angezeigt.
+    {% else %}
+      Es werden alle {{ n_total_rows }} Ergebnisse angezeigt.
+    {% endif %}
+  </p>
+
+  <table>
+    <thead>
+    <tr>
+      <th>{{ "Stellwerk" if cluster_size == 1 else "Cluster" }}</th>
+      <th>Nachbarn</th>
+      <th>Region</th>
+      <th><abbr title="Direkte Übergabepunkte im Cluster">
+        {{ metric_col_labels["intra_handovers"] }}</abbr></th>
+      <th><abbr title="Direkte Übergabepunkte mit Nachbarstellwerken">
+        {{ metric_col_labels["nghbr_handovers"] }}</abbr></th>
+      <th><abbr title="Nachbarstellwerke">
+        {{ metric_col_labels["n_neighbors"] }}</abbr></th>
+      <th><abbr title="Durchschnittlicher Schwierigkeitsgrad im Cluster">
+        {{ metric_col_labels["difficulty"] }}</abbr></th>
+      <th><abbr title="Durchschnittlicher Unterhaltungsfaktor im Cluster">
+        {{ metric_col_labels["entertainment"] }}</abbr></th>
+      <th><abbr title="Durchschnitt des durchschnittlichen Schwierigkeitsgrads und Unterhaltungsfaktors im Cluster">
+        {{ metric_col_labels["difent"] }}</abbr></th>
+      <th><abbr title="Häufigste Spielzeit der Kommentare für Stellwerke im Cluster">
+        {{ metric_col_labels["mode_playing_time"] }}</abbr></th>
+      <th><abbr title="Belegte Stellewerke im Cluster (Min. der Instanzen)">
+        {{ metric_col_labels["intra_occupied"] }}</abbr></th>
+      <th><abbr title="Belegte Nachbarstellwerke (Max. der Instanzen)">
+        {{ metric_col_labels["nghbr_occupied"] }}</abbr></th>
+      <th><abbr title="Belegte Stellwerke in der Region exklusiv des Clusters (Max. der Instanzen & Regionen)">
+        {{ metric_col_labels["region_occupied"] }}</abbr></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in rows %}
+      <tr>
+        <td>
+          {% set cluster = row["cluster"] %}
+          {% if cluster_size == 1 %}
+            {{ stw_with_tooltip(cluster|first, "width: min-content; margin: auto") }}
+          {% else %}
+            <div class="stw-container">
+              <svg class="stw-background" viewBox="-5 -3 110 39" preserveAspectRatio="none">
+                {% set coord_lookup = dict(zip(cluster, stw_coords)) %}
+                {% for edge in row["intra_edges"] %}
+                  {% set stw_1_x, stw_1_y = coord_lookup[edge.fst()] %}
+                  {% set stw_2_x, stw_2_y = coord_lookup[edge.snd()] %}
+                  <line x1="{{ stw_1_x }}" y1="{{ stw_1_y / 3 }}" x2="{{ stw_2_x }}" y2="{{ stw_2_y / 3 }}"
+                        stroke="{{ "#9466df" if edge.handover else "#000" }}"></line>
+                {% endfor %}
+              </svg>
+              {% for stw, (x, y) in zip(cluster, stw_coords) %}
+                <div class="stw-parent" style="left: {{ x }}%; top: {{ y }}%">
+                  {{ stw_with_tooltip(stw, "transform: translate(-{}%, -{}%)".format(x, y)) }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </td>
+        <td>
+          <div class="neighbor-wrapper">
+            {% for nghb in row["neighbors"] %}
+              <div class="stw">
+                {{ stw_core_box(nghb) }}
+              </div>
+            {% endfor %}
+          </div>
+        </td>
+        <td>
+          <ul>
+            {% for region in row["regions"] %}
+              <li><a href="https://www.stellwerksim.de/anlagen.php?beta=on#region={{ region.rid }}" target="_blank">
+                {{ region.name }}
+              </a></li>
+            {% endfor %}
+          </ul>
+        </td>
+        <td>{{ row["intra_handovers"] }}</td>
+        <td>{{ row["nghbr_handovers"] }}</td>
+        <td>{{ row["n_neighbors"] }}</td>
+        <td>{{ "{:.2f}".format(row["difficulty"]) if not isnan(row["difficulty"]) else "&ndash;"|safe }}</td>
+        <td>{{ "{:.2f}".format(row["entertainment"]) if not isnan(row["entertainment"]) else "&ndash;"|safe }}</td>
+        <td>{{ "{:.2f}".format(row["difent"]) if not isnan(row["difent"]) else "&ndash;"|safe }}</td>
+        <td>{{ row["mode_playing_time"] }}</td>
+        <td>{{ row["intra_occupied"] }}</td>
+        <td>{{ row["nghbr_occupied"] }}</td>
+        <td>{{ row["region_occupied"] }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</main>
+
+<footer>
+  Mit ganz viel &hearts; gebaut von Felix Mujkanovic
+  (<a href="https://github.com/LoadingByte" target="_blank">LoadingByte</a>).<br/>
+  Quellen sind verfügbar auf
+  <a href="https://github.com/LoadingByte/sts-inquiry" target="_blank">GitHub</a>.
+</footer>
+
+</body>
+</html>

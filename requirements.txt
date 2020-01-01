@@ -1,0 +1,6 @@
+requests
+lxml
+numpy
+pandas
+Flask
+Flask-WTF

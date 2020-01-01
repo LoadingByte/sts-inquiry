@@ -1,0 +1,143 @@
+.stw-container {
+    position: relative;
+    width: 24em;
+    height: 8em;
+}
+
+.stw-background {
+    width: 100%;
+    height: 100%;
+}
+
+.stw-parent {
+    position: absolute;
+    /* Without this, the parent could block mouse interactions with elements further right on the page. */
+    visibility: hidden;
+}
+
+.stw {
+    visibility: visible; /* reset the stw-parent's visibility. */
+    position: relative; /* for the tooltip z-index */
+    padding: 0 0.2em 0 0.2em;
+
+    font-size: 0.9em;
+    background-color: #ffe;
+    border: 2px solid #7f7f7f;
+    box-shadow: 0 0 2px #aaa;
+}
+
+.stw:hover {
+    background-color: #ffd;
+    box-shadow: inset 0 0 3px #777;
+    z-index: 1; /* for the tooltip */
+}
+
+/* Stw name */
+.stw > a {
+    white-space: nowrap;
+    text-decoration: inherit; /* disable link underline */
+
+    /* Narrower font */
+    font-family: "Open Sans Condensed", "Helvetica Narrow", "Arial Narrow", "Open Sans",
+    Helvetica, Arial, sans-serif;
+}
+
+.stw-player-marker-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+.stw-player-marker {
+    width: 47%;
+    height: 2px;
+    background-color: #e0c;
+}
+
+.stw-tooltip-wrapper {
+    /* Can't use display: none instead of visibility because Firefox destroys iframes when they become display: none. */
+    visibility: hidden;
+
+    position: absolute;
+    left: -2px;
+
+    background-color: #ffe;
+    border: 2px solid #7f7f7f;
+}
+
+.stw:hover > .stw-tooltip-wrapper {
+    visibility: visible;
+}
+
+.stw-tooltip {
+    margin: 0.5em;
+    min-height: 30em;
+
+    display: grid;
+    grid-template-columns: 20em auto 8em;
+    grid-gap: 1em;
+    /* @formatter:off */
+    grid-template-areas:
+        "pic lbl num"
+        "pic cmt cmt"
+        "map cmt cmt"
+        "lnk cmt cmt"
+        ".   cmt cmt";
+    /* @formatter:on */
+
+    font-size: 0.9em;
+}
+
+.stw-tooltip-pic {
+    grid-area: pic;
+}
+
+.stw-tooltip-pic img {
+    width: 100%;
+}
+
+.stw-tooltip-map {
+    grid-area: map;
+    width: 100%;
+    height: 20em;
+    border: None;
+}
+
+.stw-tooltip-map-link {
+    grid-area: lnk;
+    text-align: center;
+}
+
+.stw-tooltip-num-labels {
+    grid-area: lbl;
+}
+
+.stw-tooltip-nums {
+    grid-area: num;
+}
+
+.stw-tooltip-comment-wrapper {
+    grid-area: cmt;
+    max-height: 30em; /* this is a good value for most heights of stw screenshots */
+    overflow-y: auto; /* y scrolling */
+    padding-right: 0.5em; /* padding between this and the scrollbar */
+}
+
+.stw-tooltip-comment {
+    margin-top: 0.8em;
+}
+
+/* Playing time */
+.stw-tooltip-comment > div {
+    float: right;
+    white-space: nowrap;
+    color: #888;
+}
+
+/* Clear playing time float */
+.stw-tooltip-comment::after {
+    display: block;
+    clear: both;
+    visibility: hidden;
+    content: ".";
+    height: 0;
+}

@@ -1,0 +1,160 @@
+a {
+    color: black;
+}
+
+body {
+    margin: 0;
+    padding: 1em 4vw;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+}
+
+/* Header */
+
+header {
+    margin: 1em 0 5em 0;
+    text-align: center;
+}
+
+header * {
+    margin: 0;
+}
+
+header h1 {
+    font-size: 2.3em;
+}
+
+/* Form */
+
+input {
+    box-sizing: border-box; /* avoid overflow */
+    width: 100%;
+}
+
+.form-wrapper {
+    display: table; /* as small as possible */
+    margin: auto; /* center */
+}
+
+form {
+    display: grid;
+    grid-gap: 1.2em 2em;
+    /* @formatter:off */
+    grid-template-areas:
+        "clsz   regions sort"
+        "name   regions sort"
+        "free   regions sort"
+        "submit submit  submit";
+    /* @formatter:on */
+
+    /* Separator between this and the results */
+    padding-bottom: 2em;
+    border-bottom: 2px dotted #aaa;
+    margin-bottom: 1.5em;
+}
+
+.form-clsz, .form-free {
+    display: grid;
+    grid-template-columns: min-content auto;
+    grid-gap: 0.8em;
+}
+
+.form-free {
+    grid-gap: 0.5em;
+}
+
+.form-name, .form-regions, .form-sort {
+    display: grid;
+    grid-template-rows: min-content auto;
+    grid-gap: 0.5em;
+}
+
+.form-name {
+    grid-gap: 0.2em;
+}
+
+.form-regions > select {
+    height: 100%;
+}
+
+.form-sort > div {
+    display: grid;
+    align-content: start;
+    align-items: start;
+    grid-gap: 0.5em 0.8em;
+    /* @formatter:off */
+    grid-template-areas:
+        "label-1 field-1"
+        "label-2 field-2"
+        "label-3 field-3";
+    /* @formatter:on */
+}
+
+/* Result count notice */
+main > p {
+    text-align: center;
+}
+
+/* Table */
+
+table {
+    margin: auto; /* center */
+    border-collapse: collapse;
+}
+
+th {
+    padding: 1em 0.5em;
+    border-bottom: 2px solid black;
+}
+
+/* Default padding for most columns */
+td {
+    padding: 1.5em 0.5em;
+}
+
+/* Cluster column */
+td:nth-child(1) {
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+}
+
+/* Neighbors and region columns */
+td:nth-child(2), td:nth-child(3) {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+tbody tr:not(:first-child) td {
+    border-top: 2px solid #444;
+}
+
+th:not(:first-child), td:not(:first-child) {
+    border-left: 1px dashed #ccc;
+    text-align: center;
+}
+
+.neighbor-wrapper {
+    max-width: 25em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.neighbor-wrapper .stw {
+    margin: 0.3em 0.5em; /* spacing between stws */
+}
+
+ul {
+    padding-left: 0;
+    list-style: none;
+}
+
+/* Footer */
+
+footer {
+    margin-top: 5em;
+    text-align: center;
+}
+
+footer, footer a {
+    color: gray;
+}
