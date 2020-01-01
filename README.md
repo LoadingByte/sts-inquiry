@@ -1,6 +1,6 @@
 # Sts Inquiry
 
-StellwerkSim Inquiry is a powerful web-based search engine for the railway signal boxes from the game [StellwerkSim](https://stellwerksim.de).
+StellwerkSim Inquiry is a powerful web-based search engine for the railway signal boxes from the game [StellwerkSim](https://www.stellwerksim.de/).
 It is written in Python 3 and, because the game is only available in German, its UI also uses the German language.
 
 A production instance of the webapp is permanently hosted at https://loadingbyte.com/sts-inquiry. Check it out!
