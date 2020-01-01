@@ -3,16 +3,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Iterator
+from urllib.parse import urljoin
 
 import requests
 
-from sts_inquiry.pipeline.consts import BASE_URL, USER_AGENT
+from sts_inquiry import app
 
 
 def fetch_players() -> Iterator[PlayerPrototype]:
     # Any IOError here will be forwarded to the calling function, which is the desired behavior.
-    resp = requests.get(f"{BASE_URL}/anlagen.php?subdata=ajax&m=players",
-                        headers={"User-Agent": USER_AGENT})
+    resp = requests.get(urljoin(app.config["STS_URL"], "anlagen.php?subdata=ajax&m=players"),
+                        headers={"User-Agent": app.config["FETCH_USER_AGENT"]})
 
     for line in resp.text.splitlines():
         line = line.strip()

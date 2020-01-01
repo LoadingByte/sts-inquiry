@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+from urllib.parse import urljoin
 
 import numpy as np
 from flask import Flask
@@ -36,7 +37,7 @@ if app_root != "/":
 # Configure the template engine.
 app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
-app.jinja_env.globals.update(zip=zip, isnan=np.isnan)
+app.jinja_env.globals.update(zip=zip, isnan=np.isnan, urljoin=urljoin, sts_url=app.config["STS_URL"])
 
 # Initialize routes.
 from . import views

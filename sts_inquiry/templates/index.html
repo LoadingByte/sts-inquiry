@@ -14,12 +14,13 @@
   <h1>StellwerkSim Inquiry</h1>
   <p>
     Die leistungsstarke Stellwerksuche für den
-    <a href="https://www.stellwerksim.de" target="_blank">StellwerkSim</a>.
+    <a href="{{ sts_url }}" target="_blank">StellwerkSim</a>.
   </p>
 </header>
 
 {% macro stw_core_box(stw) %}
-  <a href="https://www.stellwerksim.de/anlagen.php?beta=on#stellwerk={{ stw.aid }}" target="_blank">{{ stw.name }}</a>
+  <a href="{{ urljoin(sts_url, "anlagen.php?beta=on#stellwerk={}".format(stw.aid)) }}"
+     target="_blank">{{ stw.name }}</a>
   <div class="stw-player-marker-wrapper">
     <div class="stw-player-marker" style="{{ "visibility: hidden" if not stw.occupants[0] }}"></div>
     <div class="stw-player-marker" style="{{ "visibility: hidden" if not stw.occupants[1] }}"></div>
@@ -31,9 +32,10 @@
     {{ stw_core_box(stw) }}
     <div class="stw-tooltip-wrapper">
       <div class="stw-tooltip">
-        <a class="stw-tooltip-pic" href="{{ stw.screenshot_url }}" target="_blank"
+        {% set screenshot_url = urljoin(sts_url, "shot/see_{}.jpeg".format(stw.aid)) %}
+        <a class="stw-tooltip-pic" href="{{ screenshot_url }}" target="_blank"
            title="Größeres Bild anzeigen">
-          <img src="{{ stw.screenshot_url }}" alt="Screenshot des Stellwerks"/>
+          <img src="{{ screenshot_url }}" alt="Screenshot des Stellwerks"/>
         </a>
         {% if stw.latitude is not none and stw.longitude is not none %}
           <div class="stw-tooltip-map-placeholder">
@@ -176,7 +178,7 @@
         <td>
           <ul>
             {% for region in row["regions"] %}
-              <li><a href="https://www.stellwerksim.de/anlagen.php?beta=on#region={{ region.rid }}" target="_blank">
+              <li><a href="{{ urljoin(sts_url, "anlagen.php?beta=on#region={}".format(region.rid)) }}" target="_blank">
                 {{ region.name }}
               </a></li>
             {% endfor %}

@@ -5,18 +5,22 @@ import logging
 import re
 from dataclasses import dataclass
 from typing import Iterator, Tuple, List, Set
+from urllib.parse import urljoin
 
 import requests
 from lxml import html
 from markupsafe import Markup
 
-from sts_inquiry.pipeline.consts import BASE_URL, USER_AGENT, PLAYING_TIME_CONVERSION
+from sts_inquiry import app
+from sts_inquiry.pipeline.consts import PLAYING_TIME_CONVERSION
 from sts_inquiry.structs import Region, Comment
+
+_STS_URL = app.config["STS_URL"]
 
 
 def fetch_landscape() -> Tuple[List[Region], Set[EdgePrototype], List[StwPrototype]]:
     session = requests.Session()
-    session.headers.update({"User-Agent": USER_AGENT})
+    session.headers.update({"User-Agent": app.config["FETCH_USER_AGENT"]})
 
     logging.info(" * Fetching region rids...")
     rids = set(_fetch_rids(session))
@@ -49,7 +53,7 @@ def fetch_landscape() -> Tuple[List[Region], Set[EdgePrototype], List[StwPrototy
 # ========== MAIN PAGE ==========
 
 def _fetch_rids(session: requests.Session) -> Iterator[int]:
-    resp = session.get(f"{BASE_URL}/anlagen.php")
+    resp = session.get(urljoin(_STS_URL, "anlagen.php"))
     page = html.fromstring(resp.content)
 
     for rid in page.xpath("//tr[@class='regionname']/@rid"):
@@ -59,7 +63,7 @@ def _fetch_rids(session: requests.Session) -> Iterator[int]:
 # ========== REGION MAP JSON ==========
 
 def _fetch_region_map(session: requests.Session, rid: int) -> Tuple[Region, List[int], List[EdgePrototype]]:
-    resp = session.get(f"{BASE_URL}/landschaft-data.php?rid={rid}")
+    resp = session.get(urljoin(_STS_URL, f"landschaft-data.php?rid={rid}"))
     data = json.loads(resp.text)
 
     region = Region(rid=rid, name=data["region"], stws=[])
@@ -89,7 +93,7 @@ def _fetch_region_map(session: requests.Session, rid: int) -> Tuple[Region, List
 # ========== SINGLE STW ==========
 
 def _fetch_stw(session: requests.Session, aid: int) -> StwPrototype:
-    resp = session.get(f"{BASE_URL}/anlagen.php?subdata=ajax&m=anlage&aid={aid}")
+    resp = session.get(urljoin(_STS_URL, f"anlagen.php?subdata=ajax&m=anlage&aid={aid}"))
     data = _stw_parse_custom_format(resp.text)
 
     assert aid == int(data["A"]), f"Stw aid in url {aid} doesn't match returned aid {data['A']}."
@@ -102,8 +106,6 @@ def _fetch_stw(session: requests.Session, aid: int) -> StwPrototype:
         str_lat, str_lon = data["C"].split(":")
         latitude, longitude = float(str_lat), float(str_lon)
 
-    screenshot_url = f"{BASE_URL}/shot/see_{aid}.jpeg"
-
     desc, difficulty, entertainment, forum_id = _stw_parse_desc(data["B"])
 
     comments = []
@@ -112,8 +114,7 @@ def _fetch_stw(session: requests.Session, aid: int) -> StwPrototype:
         comments = list(reversed(list(_fetch_comments(session, forum_id))))
 
     return StwPrototype(aid=aid, rid=rid,
-                        name=name, description=desc, screenshot_url=screenshot_url,
-                        latitude=latitude, longitude=longitude,
+                        name=name, description=desc, latitude=latitude, longitude=longitude,
                         difficulty=difficulty, entertainment=entertainment, comments=comments)
 
 
@@ -154,7 +155,7 @@ def _stw_parse_desc(desc: str):
 
 
 def _fetch_comments(session: requests.Session, forum_id: str) -> Iterator[Comment]:
-    resp = session.get(f"{BASE_URL}/forum/viewtopic.php?t={forum_id}")
+    resp = session.get(urljoin(_STS_URL, f"forum/viewtopic.php?t={forum_id}"))
     page = html.fromstring(resp.content)
 
     # Note: We skip the first comment since it's just saying that this thread is a shoutbox.
@@ -182,7 +183,6 @@ class StwPrototype:
 
     name: str
     description: Markup
-    screenshot_url: str
     latitude: float
     longitude: float
 

@@ -19,7 +19,6 @@ def link_landscape(regions: List[Region], edge_protos: Collection[EdgePrototype]
                            neighbors=[],
                            name=stw_p.name,
                            description=stw_p.description,
-                           screenshot_url=stw_p.screenshot_url,
                            latitude=stw_p.latitude,
                            longitude=stw_p.longitude,
                            difficulty=stw_p.difficulty,

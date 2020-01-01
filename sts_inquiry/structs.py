@@ -58,7 +58,6 @@ class Stw:
 
     name: str
     description: Markup
-    screenshot_url: str
     latitude: Optional[float]
     longitude: Optional[float]
 

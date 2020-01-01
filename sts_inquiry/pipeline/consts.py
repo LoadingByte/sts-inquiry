@@ -1,6 +1,3 @@
-BASE_URL = "https://www.stellwerksim.de"
-USER_AGENT = "Mozilla/5.0 Firefox"  # This UA activates the beta version of the Sts website.
-
 PLAYING_TIME_CONVERSION = {
     "Spieldauer: unter 15 Minuten": "<15 min",
     "Spieldauer: unter 30 Minuten": "<30 min",
