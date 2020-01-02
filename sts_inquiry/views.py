@@ -16,7 +16,6 @@ METRIC_COL_LABELS = {
     "entertainment": "\u2300\U0001F3A2",
     "difent": "\u2300\u2300\U0001F92F\U0001F3A2",
     "mode_playing_time": "\u2300\u23F3",
-    "intra_occupied": "#C\U0001F464",
     "nghbr_occupied": "#N\U0001F464",
     "region_occupied": "#R\U0001F464"
 }
@@ -72,6 +71,7 @@ def index():
     return render_template("index.html",
                            form=form,
                            metric_col_labels=METRIC_COL_LABELS, cluster_size=cluster_size, stw_coords=stw_coords,
+                           instance=form.instance.data if form.instance.used else None,
                            rows=rows, n_total_rows=n_total_rows,
                            search_params=search_params, cur_page=page, prev_pages=prev_pages, next_pages=next_pages)
 
@@ -81,6 +81,12 @@ def _search(form, page: int):
         # Get the appropriate df for the selected cluster size.
         cluster_size = form.clustersize.data
         df = cache.dfs[cluster_size - 1]
+
+        # Pick the appropriate player-related columns for the selected instance.
+        inst = form.instance.data if form.instance.used else "max"
+        df = df.rename(columns={f"free_{inst}": "free",
+                                f"nghbr_occupied_{inst}": "nghbr_occupied",
+                                f"region_occupied_{inst}": "region_occupied"})
 
         # Filter and sort the df according to the user inputs.
         df = _filter(df,
@@ -108,15 +114,15 @@ def _search(form, page: int):
 
 def _filter(df, name_filter: Optional[str], region_filter: Optional[List[int]], free_filter: Optional[bool]):
     if free_filter:
-        df = df[df["intra_occupied"] == 0]
+        df = df[df["free"]]
+
+    if name_filter:
+        df = df[df["concat_names"].str.contains(name_filter, case=False, regex=False)]
 
     if region_filter:
         region_filter = set(region_filter)  # hopefully, computing this first is better for performance.
         df = df[[len({reg.rid for reg in regions}.intersection(region_filter)) > 0
                  for regions in df["regions"]]]
-
-    if name_filter:
-        df = df[df["concat_names"].str.contains(name_filter, case=False, regex=False)]
 
     return df
 

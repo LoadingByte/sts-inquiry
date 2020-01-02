@@ -65,6 +65,9 @@ class Stw:
     entertainment: Optional[float]  # 1 through 4
     comments: List[Comment]
 
+    def occupants_at(self, instance: int):
+        return self.occupants[instance - 1]
+
     def __eq__(self, other):
         return isinstance(other, Stw) and self.aid == other.aid
 

@@ -36,6 +36,7 @@ form {
     /* @formatter:off */
     grid-template-areas:
         "clsz   regions sort"
+        "inst   regions sort"
         "name   regions sort"
         "free   regions sort"
         "submit submit  submit";
@@ -47,7 +48,7 @@ form {
     margin-bottom: 1.5em;
 }
 
-.form-clsz, .form-free {
+.form-clsz, .form-inst, .form-free {
     display: grid;
     grid-template-columns: min-content auto;
     grid-gap: 0.8em;

@@ -12,7 +12,7 @@ from lxml import html
 from markupsafe import Markup
 
 from sts_inquiry import app
-from sts_inquiry.pipeline.consts import PLAYING_TIME_CONVERSION
+from sts_inquiry.consts import PLAYING_TIME_CONVERSION
 from sts_inquiry.structs import Region, Comment
 
 _STS_URL = app.config["STS_URL"]

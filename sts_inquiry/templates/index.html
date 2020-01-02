@@ -113,6 +113,10 @@
         {{ form.clustersize.label }}
         {{ form.clustersize }}
       </div>
+      <div class="form-inst" style="grid-area: inst">
+        {{ form.instance.label }}
+        {{ form.instance }}
+      </div>
       <div class="form-name" style="grid-area: name">
         {{ form.name.label }}
         {{ form.name }}
@@ -156,29 +160,31 @@
   <table>
     <thead>
     <tr>
+      {% set multi = cluster_size > 1 %}
       <th>Rang</th>
-      <th>{{ "Stellwerk" if cluster_size == 1 else "Cluster" }}</th>
+      <th>{{ "Cluster" if multi else "Stellwerk" }}</th>
       <th>Nachbarn</th>
       <th>Region</th>
-      <th><abbr title="Direkte Übergabepunkte im Cluster">
+      <th><abbr title="Direkte Übergabepunkte{{ ' im Cluster' if multi }}">
         {{ metric_col_labels["intra_handovers"] }}</abbr></th>
       <th><abbr title="Direkte Übergabepunkte mit Nachbarstellwerken">
         {{ metric_col_labels["nghbr_handovers"] }}</abbr></th>
       <th><abbr title="Nachbarstellwerke">
         {{ metric_col_labels["n_neighbors"] }}</abbr></th>
-      <th><abbr title="Durchschnittlicher Schwierigkeitsgrad im Cluster">
+      <th><abbr title="{{ 'Durchschnittlicher ' if multi }}Schwierigkeitsgrad{{ ' im Cluster' if multi }}">
         {{ metric_col_labels["difficulty"] }}</abbr></th>
-      <th><abbr title="Durchschnittlicher Unterhaltungsfaktor im Cluster">
+      <th><abbr title="{{ 'Durchschnittlicher ' if multi }}Unterhaltungsfaktor{{ ' im Cluster' if multi }}">
         {{ metric_col_labels["entertainment"] }}</abbr></th>
-      <th><abbr title="Durchschnitt des durchschnittlichen Schwierigkeitsgrads und Unterhaltungsfaktors im Cluster">
+      <th><abbr
+          title="Durchschnitt des {{ 'durchschnittlichen ' if multi }}Schwierigkeitsgrads und Unterhaltungsfaktors{{ ' im Cluster' if multi }}">
         {{ metric_col_labels["difent"] }}</abbr></th>
-      <th><abbr title="Häufigste Spielzeit der Kommentare für Stellwerke im Cluster">
+      <th><abbr title="Häufigste Spielzeit der Kommentare{{ ' für Stellwerke im Cluster' if multi }}">
         {{ metric_col_labels["mode_playing_time"] }}</abbr></th>
-      <th><abbr title="Belegte Stellewerke im Cluster (Min. der Instanzen)">
-        {{ metric_col_labels["intra_occupied"] }}</abbr></th>
-      <th><abbr title="Belegte Nachbarstellwerke (Max. der Instanzen)">
+      <th><abbr
+          title="{{ 'Falls unbesetzt: ' if instance }}Belegte Nachbarstellwerke {{ 'in Instanz {}'.format(instance) if instance else '(Maximum der unbesetzten Instanzen)' }}">
         {{ metric_col_labels["nghbr_occupied"] }}</abbr></th>
-      <th><abbr title="Belegte Stellwerke in der Region exklusiv des Clusters (Max. der Instanzen & Regionen)">
+      <th><abbr
+          title="{{ 'Falls unbesetzt: ' if instance }}Maximal belegte andere Stellwerke in {{ 'einer der Regionen des Clusters' if multi else 'der Region des Stellwerks' }} ({{ 'in Instanz {}'.format(instance) if instance else 'Maximum der unbesetzten Instanzen' }})">
         {{ metric_col_labels["region_occupied"] }}</abbr></th>
     </tr>
     </thead>
@@ -211,9 +217,9 @@
         </td>
         <td>
           <div class="neighbor-wrapper">
-            {% for nghb in row["neighbors"] %}
+            {% for nghbr in row["neighbors"] %}
               <div class="stw">
-                {{ stw_core_box(nghb) }}
+                {{ stw_core_box(nghbr) }}
               </div>
             {% endfor %}
           </div>
@@ -234,9 +240,8 @@
         <td>{{ "{:.2f}".format(row["entertainment"]) if not isnan(row["entertainment"]) else "&ndash;"|safe }}</td>
         <td>{{ "{:.2f}".format(row["difent"]) if not isnan(row["difent"]) else "&ndash;"|safe }}</td>
         <td>{{ row["mode_playing_time"] }}</td>
-        <td>{{ row["intra_occupied"] }}</td>
-        <td>{{ row["nghbr_occupied"] }}</td>
-        <td>{{ row["region_occupied"] }}</td>
+        <td>{{ "{:.0f}".format(row["nghbr_occupied"]) if not isnan(row["nghbr_occupied"]) else "&ndash;"|safe }}</td>
+        <td>{{ "{:.0f}".format(row["region_occupied"]) if not isnan(row["region_occupied"]) else "&ndash;"|safe }}</td>
       </tr>
     {% endfor %}
     </tbody>

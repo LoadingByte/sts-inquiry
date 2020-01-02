@@ -1,3 +1,5 @@
+INSTANCES = [1, 2]
+
 PLAYING_TIME_CONVERSION = {
     "Spieldauer: unter 15 Minuten": "<15 min",
     "Spieldauer: unter 30 Minuten": "<30 min",

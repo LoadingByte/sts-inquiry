@@ -25,11 +25,11 @@ def cluster_landscape(world: World) -> List[Set[FrozenSet[Stw]]]:
         all_clusters.append(cur_clusters)
 
         for cluster in prev_clusters:
-            nghb_stws = {nghb.stw
-                         for stw in cluster for nghb in stw.neighbors
-                         if nghb.stw not in cluster}
-            for nghb_stw in nghb_stws:
-                cur_clusters.add(cluster.union({nghb_stw}))
+            nghbr_stws = {nghbr.stw
+                          for stw in cluster for nghbr in stw.neighbors
+                          if nghbr.stw not in cluster}
+            for nghbr_stw in nghbr_stws:
+                cur_clusters.add(cluster.union({nghbr_stw}))
 
     log.info(" * Finished computing a total of %d stw clusters.", sum(len(clusters) for clusters in all_clusters))
 

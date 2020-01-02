@@ -3,6 +3,7 @@ from typing import Iterable
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, SelectField, SelectMultipleField, SubmitField
 
+from sts_inquiry.consts import INSTANCES
 from sts_inquiry.structs import Region
 
 _SORT_ORDERS = [("asc", "\u2B08 aufsteigend"), ("desc", "\u2B0A absteigend")]
@@ -10,6 +11,8 @@ _SORT_ORDERS = [("asc", "\u2B08 aufsteigend"), ("desc", "\u2B0A absteigend")]
 
 class SearchForm(FlaskForm):
     clustersize = SelectField("Clustergröße", coerce=int, default=1)
+    instance = SelectField("Instanz", coerce=int, default=-1,
+                           choices=[(-1, "-- Alle --")] + [(inst, str(inst)) for inst in INSTANCES])
 
     name = StringField("Stellwerkname")
     regions = SelectMultipleField("Regionen", coerce=int)
@@ -23,6 +26,7 @@ class SearchForm(FlaskForm):
 
     def mark_used_fields(self):
         self.clustersize.used = True
+        self.instance.used = self.instance.validate(self) and self.instance.data != -1
         self.name.used = self.name.validate(self) and self.name.data.strip() != ""
         self.regions.used = self.regions.validate(self) and -1 not in self.regions.data
         self.free.used = self.free.validate(self) and self.free.data
@@ -37,7 +41,7 @@ def create_search_form(args,
     form = SearchForm(args)
 
     cluster_sizes = range(1, max_cluster_size + 1)
-    form.clustersize.choices = list(zip(cluster_sizes, cluster_sizes))
+    form.clustersize.choices = [(sz, str(sz)) for sz in cluster_sizes]
 
     form.regions.choices = [(-1, "-- Alle --")] + \
                            [(region.rid, region.name) for region in regions]

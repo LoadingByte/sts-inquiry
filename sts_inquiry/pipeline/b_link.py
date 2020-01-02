@@ -1,6 +1,7 @@
 import logging
 from typing import Collection, List
 
+from sts_inquiry.consts import INSTANCES
 from sts_inquiry.pipeline.a_fetch.landscape_fetcher import EdgePrototype, StwPrototype
 from sts_inquiry.pipeline.a_fetch.player_fetcher import PlayerPrototype
 from sts_inquiry.structs import World, Edge, Region, Stw, Neighbor, Player
@@ -58,4 +59,4 @@ def link_players(world: World, player_items: List[PlayerPrototype]):
                      for pl_i in player_items}
 
     for stw in world.stws:
-        stw.occupants = [player_lookup.get((stw.aid, instance)) for instance in [1, 2]]
+        stw.occupants = [player_lookup.get((stw.aid, inst)) for inst in INSTANCES]
