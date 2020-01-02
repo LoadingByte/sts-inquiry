@@ -18,17 +18,19 @@ from sts_inquiry.structs import Region, Comment
 _STS_URL = app.config["STS_URL"]
 _USER_AGENT = app.config["FETCH_USER_AGENT"]
 
+log = logging.getLogger("sts-inquiry")
+
 
 def fetch_landscape() -> Tuple[List[Region], Set[EdgePrototype], List[StwPrototype]]:
     session = requests.Session()
     session.headers.update({"User-Agent": _USER_AGENT})
 
-    logging.info(" * Fetching region rids...")
+    log.info(" * Fetching region rids...")
     rids = set(_fetch_rids(session))
     if len(rids) == 0:
         raise ValueError("No regions found.")
 
-    logging.info(" * Fetching region maps for %d regions...", len(rids))
+    log.info(" * Fetching region maps for %d regions...", len(rids))
     regions = []
     aids = set()
     edge_protos = set()
@@ -38,14 +40,14 @@ def fetch_landscape() -> Tuple[List[Region], Set[EdgePrototype], List[StwPrototy
         aids.update(r_aids)
         edge_protos.update(r_edges)
 
-    logging.info(" * Fetching %d stws...", len(aids))
+    log.info(" * Fetching %d stws...", len(aids))
     stw_protos = []
     for ctr, aid in enumerate(aids):
         stw_protos.append(_fetch_stw(session, aid))
         if (ctr + 1) % 50 == 0:
-            logging.info(" *  * Fetched %d of %d stws.", ctr + 1, len(aids))
+            log.info(" *  * Fetched %d of %d stws.", ctr + 1, len(aids))
 
-    logging.info(" * Finished fetching raw landscape information.")
+    log.info(" * Finished fetching raw landscape information.")
 
     # Return the crawled objects.
     return regions, edge_protos, stw_protos

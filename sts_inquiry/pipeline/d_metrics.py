@@ -7,9 +7,11 @@ import pandas as pd
 from sts_inquiry.pipeline.consts import PLAYING_TIME_ORDER_ASC
 from sts_inquiry.structs import Edge, Stw
 
+log = logging.getLogger("sts-inquiry")
+
 
 def landscape_metrics(all_clusters: Iterable[Set[FrozenSet[Stw]]]) -> Iterator[pd.DataFrame]:
-    logging.info(" * Computing landscape metrics for all clusters...")
+    log.info(" * Computing landscape metrics for all clusters...")
 
     for clusters in all_clusters:
         neighbors = [{nghb.stw
@@ -46,7 +48,7 @@ def landscape_metrics(all_clusters: Iterable[Set[FrozenSet[Stw]]]) -> Iterator[p
 
         yield pd.DataFrame(cols)
 
-    logging.info(" * Finished computing landscape metrics.")
+    log.info(" * Finished computing landscape metrics.")
 
 
 def _intra_or_nghbr_edges(intra_or_nghbr: str, cluster: FrozenSet[Stw]) -> Set[Edge]:

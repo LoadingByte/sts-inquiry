@@ -1,6 +1,6 @@
 # Custom
 .idea/
-sts-inquiry.log
+logs/
 
 
 # Byte-compiled / optimized / DLL files

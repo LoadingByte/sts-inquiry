@@ -4,6 +4,8 @@ from threading import Thread, Timer
 from sts_inquiry import app, cache
 from sts_inquiry.pipeline import run_landscape_pipeline, run_player_pipeline
 
+log = logging.getLogger("sts-inquiry")
+
 _fi_landscape = app.config["FETCH_INTERVAL_LANDSCAPE"]
 _fi_players = app.config["FETCH_INTERVAL_PLAYERS"]
 assert _fi_landscape % _fi_players == 0, "FETCH_INTERVAL_LANDSCAPE must be a multiple of FETCH_INTERVAL_PLAYERS"
@@ -30,16 +32,16 @@ def _periodic():
 
 
 def _fetch_and_handle_errors(label, update_fn):
-    logging.info("A %s cache update is due. Will now start fetching the current %s...", label, label)
+    log.info("A %s cache update is due. Will now start fetching the current %s...", label, label)
     try:
         update_fn()
-        logging.info("Successfully finished updating the %s cache.", label)
+        log.info("Successfully finished updating the %s cache.", label)
     except Exception as e:
-        logging.error("The following exception occurred while updating the %s cache. "
-                      "Will retry when the next cache update is due.", label)
-        logging.error(" * %s: %s", e.__class__.__name__, e)
+        log.error("The following exception occurred while updating the %s cache. "
+                  "Will retry when the next cache update is due.", label)
+        log.error(" * %s: %s", e.__class__.__name__, e)
         if e.__cause__:
-            logging.error(" * Caused by %s: %s", e.__cause__.__class__.__name__, e.__cause__)
+            log.error(" * Caused by %s: %s", e.__cause__.__class__.__name__, e.__cause__)
 
 
 def _update_landscape():

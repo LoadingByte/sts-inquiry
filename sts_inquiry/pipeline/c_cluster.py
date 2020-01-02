@@ -6,9 +6,11 @@ from sts_inquiry.structs import World, Stw
 
 _MAX_CLUSTER_SIZE = app.config["MAX_CLUSTER_SIZE"]
 
+log = logging.getLogger("sts-inquiry")
+
 
 def cluster_landscape(world: World) -> List[Set[FrozenSet[Stw]]]:
-    logging.info(" * Computing stw clusters up to size %d...", _MAX_CLUSTER_SIZE)
+    log.info(" * Computing stw clusters up to size %d...", _MAX_CLUSTER_SIZE)
 
     # We get these first two clusters for free.
     one_clusters = {frozenset({stw}) for stw in world.stws}
@@ -29,6 +31,6 @@ def cluster_landscape(world: World) -> List[Set[FrozenSet[Stw]]]:
             for nghb_stw in nghb_stws:
                 cur_clusters.add(cluster.union({nghb_stw}))
 
-    logging.info(" * Finished computing a total of %d stw clusters.", sum(len(clusters) for clusters in all_clusters))
+    log.info(" * Finished computing a total of %d stw clusters.", sum(len(clusters) for clusters in all_clusters))
 
     return all_clusters

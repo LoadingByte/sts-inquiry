@@ -1,10 +1,10 @@
-import logging
-import sys
 from urllib.parse import urljoin
 
 import numpy as np
 from flask import Flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
+
+from sts_inquiry.log import setup_logging
 
 
 def app_root_404(env, resp):
@@ -21,11 +21,7 @@ app.config.from_pyfile("settings.cfg", silent=True)
 app.config.from_envvar("STS_INQUIRY_SETTINGS", silent=True)
 
 # Setup logging.
-log_handlers = [logging.StreamHandler(sys.stderr), logging.FileHandler(app.config["LOGFILE"])]
-for handler in log_handlers:
-    handler.setLevel(logging.INFO)
-logging.basicConfig(handlers=log_handlers, level=logging.NOTSET,
-                    format="%(asctime)s %(name)-8s %(levelname)-8s %(message)s")
+setup_logging(app.config["LOG_DIR"])
 
 # Change the application root if configured.
 app_root = app.config.get("APPLICATION_ROOT", "/")

@@ -5,10 +5,12 @@ from sts_inquiry.pipeline.a_fetch.landscape_fetcher import EdgePrototype, StwPro
 from sts_inquiry.pipeline.a_fetch.player_fetcher import PlayerPrototype
 from sts_inquiry.structs import World, Edge, Region, Stw, Neighbor, Player
 
+log = logging.getLogger("sts-inquiry")
+
 
 def link_landscape(regions: List[Region], edge_protos: Collection[EdgePrototype],
                    stw_protos: Collection[StwPrototype]) -> World:
-    logging.info(" * Linking %d regions, %d stws, %d edges...", len(regions), len(stw_protos), len(edge_protos))
+    log.info(" * Linking %d regions, %d stws, %d edges...", len(regions), len(stw_protos), len(edge_protos))
 
     # Convert stws, ignoring neighbors for now.
     # Players are also ignored since that information will be linked into the world later on.
@@ -41,7 +43,7 @@ def link_landscape(regions: List[Region], edge_protos: Collection[EdgePrototype]
         stw_1.neighbors.append(Neighbor(stw=stw_2, handover=edge.handover))
         stw_2.neighbors.append(Neighbor(stw=stw_1, handover=edge.handover))
 
-    logging.info(" * Finished linking landscape.")
+    log.info(" * Finished linking landscape.")
 
     # Create the world.
     return World(regions=regions,
