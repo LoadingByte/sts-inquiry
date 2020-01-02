@@ -1,4 +1,3 @@
-from threading import Lock
 from typing import Optional, List
 from urllib.parse import urlencode
 
@@ -21,8 +20,6 @@ METRIC_COL_LABELS = {
     "region_occupied": "#R\U0001F464"
 }
 
-
-DFS_LOCK = Lock()
 _MAX_OUTPUT_ROWS = app.config["MAX_OUTPUT_ROWS"]
 
 
@@ -47,9 +44,7 @@ def index():
                                      for value in request.args.getlist(field.name)])
             return redirect(url_for("index") + "?" + clean_query, 302)
 
-    # Because we cannot assume that operations on Pandas objects are thread-safe, we better make sure that
-    # only one user request at the time can do stuff with the dfs.
-    DFS_LOCK.acquire()
+    cache.LOCK.acquire()
 
     # Get the appropriate df for the selected cluster size.
     cluster_size = form.clustersize.data
@@ -60,9 +55,10 @@ def index():
                  form.name.data if form.name.used else None,
                  form.regions.data if form.regions.used else None,
                  form.free.data if form.free.used else None)
-    df = _sort(df, [form.sortby1.data if form.sortby1.used else None,
-                    form.sortby2.data if form.sortby2.used else None,
-                    form.sortby3.data if form.sortby3.used else None])
+    df = _sort(df,
+               [form.sortby1.data if form.sortby1.used else None,
+                form.sortby2.data if form.sortby2.used else None,
+                form.sortby3.data if form.sortby3.used else None])
 
     # Limit the amount of results.
     n_total_rows = df.shape[0]
@@ -71,7 +67,7 @@ def index():
     # Get the result away from Pandas so that we can release the lock.
     rows = list(df.itertuples())
 
-    DFS_LOCK.release()
+    cache.LOCK.release()
 
     if cluster_size in _HARDCODED_STW_COORDS:
         stw_coords = _HARDCODED_STW_COORDS[cluster_size]
@@ -110,6 +106,7 @@ def _sort(df, sort_bys: Optional[List[str]]):
 
     if sort_cols:
         df = df.sort_values(sort_cols, ascending=sort_orders)
+
     return df
 
 

@@ -1,3 +1,4 @@
+from threading import Lock
 from typing import List, Tuple
 
 import pandas as pd
@@ -14,6 +15,10 @@ def run_landscape_pipeline() -> Tuple[World, List[pd.DataFrame]]:
     return world, list(landscape_metrics(cluster_landscape(world)))
 
 
-def run_player_pipeline(world: World, dfs: List[pd.DataFrame]):
-    link_players(world, list(fetch_players()))
+def run_player_pipeline(world: World, dfs: List[pd.DataFrame], lock: Lock):
+    fetched_players = list(fetch_players())
+
+    lock.acquire()
+    link_players(world, fetched_players)
     player_metrics(dfs)
+    lock.release()

@@ -43,11 +43,15 @@ def _fetch_and_handle_errors(label, update_fn):
 
 
 def _update_landscape():
-    cache.update(*run_landscape_pipeline())
+    world, dfs = run_landscape_pipeline()
+
+    cache.LOCK.acquire()
+    cache.update(world, dfs)
+    cache.LOCK.release()
 
 
 def _update_players():
-    run_player_pipeline(cache.world, cache.dfs)
+    run_player_pipeline(cache.world, cache.dfs, cache.LOCK)
 
 
 Thread(target=_periodic, daemon=True).start()
