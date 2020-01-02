@@ -13,7 +13,7 @@ log = logging.getLogger("sts-inquiry")
 def _statistic(stat: callable, vals: Iterable):
     try:
         return stat(val for val in vals if val is not None)
-    except StatisticsError:
+    except (ValueError, TypeError, StatisticsError):
         return None
 
 
@@ -78,10 +78,10 @@ def player_metrics(dfs: List[pd.DataFrame]):
             cols[f"nghbr_occupied_{inst}"] = [_n_occupied(nghbrs, inst) if free else None
                                               for free, nghbrs in zip(col_free, df["neighbors"])]
             cols[f"region_occupied_{inst}"] = [
-                max(
+                _statistic(max, (
                     _n_occupied(set(region.stws).difference(cluster), inst) if free else None
                     for region in regions
-                ) for free, cluster, regions in zip(col_free, df["cluster"], df["regions"])]
+                )) for free, cluster, regions in zip(col_free, df["cluster"], df["regions"])]
 
         # 2. Player metrics for the resp. maximum instance
         cols["free_max"] = list(map(bool, _maximize_over_inst_cols(cols, "free_")))
