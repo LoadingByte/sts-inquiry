@@ -1,5 +1,4 @@
 import logging
-import os
 import sys
 from urllib.parse import urljoin
 
@@ -29,7 +28,7 @@ logging.basicConfig(handlers=log_handlers, level=logging.NOTSET,
                     format="%(asctime)s %(name)-8s %(levelname)-8s %(message)s")
 
 # Change the application root if configured.
-app_root = os.environ.get("APPLICATION_ROOT", "/")
+app_root = app.config.get("APPLICATION_ROOT", "/")
 if app_root != "/":
     app.config["APPLICATION_ROOT"] = app_root
     app.wsgi_app = DispatcherMiddleware(app_root_404, {app_root: app.wsgi_app})
