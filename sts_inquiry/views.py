@@ -21,9 +21,9 @@ METRIC_COL_LABELS = {
     "region_occupied": "#R\U0001F464"
 }
 
-MAX_OUTPUT_ROWS = 50
 
 DFS_LOCK = Lock()
+_MAX_OUTPUT_ROWS = app.config["MAX_OUTPUT_ROWS"]
 
 
 @app.route("/")
@@ -66,7 +66,7 @@ def index():
 
     # Limit the amount of results.
     n_total_rows = df.shape[0]
-    df = df.head(MAX_OUTPUT_ROWS)
+    df = df.head(_MAX_OUTPUT_ROWS)
 
     # Get the result away from Pandas so that we can release the lock.
     rows = list(df.itertuples())

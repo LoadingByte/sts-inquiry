@@ -16,11 +16,12 @@ from sts_inquiry.pipeline.consts import PLAYING_TIME_CONVERSION
 from sts_inquiry.structs import Region, Comment
 
 _STS_URL = app.config["STS_URL"]
+_USER_AGENT = app.config["FETCH_USER_AGENT"]
 
 
 def fetch_landscape() -> Tuple[List[Region], Set[EdgePrototype], List[StwPrototype]]:
     session = requests.Session()
-    session.headers.update({"User-Agent": app.config["FETCH_USER_AGENT"]})
+    session.headers.update({"User-Agent": _USER_AGENT})
 
     logging.info(" * Fetching region rids...")
     rids = set(_fetch_rids(session))

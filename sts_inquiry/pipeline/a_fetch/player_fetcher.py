@@ -9,11 +9,14 @@ import requests
 
 from sts_inquiry import app
 
+_STS_URL = app.config["STS_URL"]
+_USER_AGENT = app.config["FETCH_USER_AGENT"]
+
 
 def fetch_players() -> Iterator[PlayerPrototype]:
     # Any IOError here will be forwarded to the calling function, which is the desired behavior.
-    resp = requests.get(urljoin(app.config["STS_URL"], "anlagen.php?subdata=ajax&m=players"),
-                        headers={"User-Agent": app.config["FETCH_USER_AGENT"]})
+    resp = requests.get(urljoin(_STS_URL, "anlagen.php?subdata=ajax&m=players"),
+                        headers={"User-Agent": _USER_AGENT})
 
     for line in resp.text.splitlines():
         line = line.strip()

@@ -1,13 +1,14 @@
 import logging
 from typing import List, Set, FrozenSet
 
+from sts_inquiry import app
 from sts_inquiry.structs import World, Stw
 
-MAX_CLUSTER_SIZE = 5
+_MAX_CLUSTER_SIZE = app.config["MAX_CLUSTER_SIZE"]
 
 
 def cluster_landscape(world: World) -> List[Set[FrozenSet[Stw]]]:
-    logging.info(" * Computing stw clusters up to size %d...", MAX_CLUSTER_SIZE)
+    logging.info(" * Computing stw clusters up to size %d...", _MAX_CLUSTER_SIZE)
 
     # We get these first two clusters for free.
     one_clusters = {frozenset({stw}) for stw in world.stws}
@@ -15,7 +16,7 @@ def cluster_landscape(world: World) -> List[Set[FrozenSet[Stw]]]:
 
     all_clusters = [one_clusters, two_clusters]
 
-    for _ in range(MAX_CLUSTER_SIZE - 2):
+    for _ in range(_MAX_CLUSTER_SIZE - 2):
         prev_clusters = all_clusters[-1]
 
         cur_clusters = set()
