@@ -18,7 +18,6 @@
 .stw {
     visibility: visible; /* reset the stw-parent's visibility. */
     position: relative; /* for the tooltip z-index */
-    padding: 0 0.2em 0 0.2em;
 
     font-size: 0.9em;
     background-color: #ffe;
@@ -34,6 +33,9 @@
 
 /* Stw name */
 .stw > a {
+    display: block;
+    padding: 0.1em 0.2em;
+
     white-space: nowrap;
     text-decoration: inherit; /* disable link underline */
 

@@ -1,3 +1,4 @@
+import math
 from typing import Optional, List
 from urllib.parse import urlencode
 
@@ -20,7 +21,7 @@ METRIC_COL_LABELS = {
     "region_occupied": "#R\U0001F464"
 }
 
-_MAX_OUTPUT_ROWS = app.config["MAX_OUTPUT_ROWS"]
+_ROWS_PER_PAGE = app.config["ROWS_PER_PAGE"]
 
 
 @app.route("/")
@@ -35,48 +36,74 @@ def index():
     # Add used=True or used=False to each field depending on whether it contains a value that is not the default.
     form.mark_used_fields()
 
-    # If the URL query string contains values for any non-used fields, remove those by redirecting.
+    # If the URL query string contains values for any non-used fields or page=1, remove those by redirecting.
     # This leads to nice an concise URLs that only contain relevant information.
-    for field in form:
-        if field.name in request.args and not field.used:
-            clean_query = urlencode([(field.name, value)
-                                     for field in form if field.used
-                                     for value in request.args.getlist(field.name)])
-            return redirect(url_for("index") + "?" + clean_query, 302)
+    form_fields = {field.name: field for field in form}
+    search_params = []
+    page_param = []
+    query_cleansing_necessary = False
+    for key, value in request.args.items(multi=True):
+        if key in form_fields and form_fields[key].used:
+            search_params.append((key, value))
+        elif key == "page" and value != "1":
+            page_param = [("page", value)]
+        else:
+            query_cleansing_necessary = True
+    if query_cleansing_necessary:
+        return redirect(url_for("index") + "?" + urlencode(search_params + page_param), 302)
 
-    cache.LOCK.acquire()
+    try:
+        page = int(request.args["page"])
+    except (KeyError, TypeError):
+        page = 1
 
-    # Get the appropriate df for the selected cluster size.
-    cluster_size = form.clustersize.data
-    df = cache.dfs[cluster_size - 1]
+    cluster_size, n_total_rows, rows = _search(form, page)
 
-    # Filter and sort the df according to the user inputs.
-    df = _filter(df,
-                 form.name.data if form.name.used else None,
-                 form.regions.data if form.regions.used else None,
-                 form.free.data if form.free.used else None)
-    df = _sort(df,
-               [form.sortby1.data if form.sortby1.used else None,
-                form.sortby2.data if form.sortby2.used else None,
-                form.sortby3.data if form.sortby3.used else None])
+    prev_pages = list(range(1, page))
+    next_pages = list(range(page + 1, math.ceil(n_total_rows / _ROWS_PER_PAGE) + 1))
 
-    # Limit the amount of results.
-    n_total_rows = df.shape[0]
-    df = df.head(_MAX_OUTPUT_ROWS)
-
-    # Get the result away from Pandas so that we can release the lock.
-    rows = list(df.itertuples())
-
-    cache.LOCK.release()
-
+    # Calculate the coordinates where the stws in each cluster should be placed.
     if cluster_size in _HARDCODED_STW_COORDS:
         stw_coords = _HARDCODED_STW_COORDS[cluster_size]
     else:
         stw_coords = [(_coordfun(v + 0.5), _coordfun(v + 0.25))
                       for v in np.linspace(0, 1, cluster_size, endpoint=False)]
 
-    return render_template("index.html", form=form, metric_col_labels=METRIC_COL_LABELS, stw_coords=stw_coords,
-                           cluster_size=cluster_size, rows=rows, n_total_rows=n_total_rows)
+    return render_template("index.html",
+                           form=form,
+                           metric_col_labels=METRIC_COL_LABELS, cluster_size=cluster_size, stw_coords=stw_coords,
+                           rows=rows, n_total_rows=n_total_rows,
+                           search_params=search_params, cur_page=page, prev_pages=prev_pages, next_pages=next_pages)
+
+
+def _search(form, page: int):
+    with cache.LOCK:
+        # Get the appropriate df for the selected cluster size.
+        cluster_size = form.clustersize.data
+        df = cache.dfs[cluster_size - 1]
+
+        # Filter and sort the df according to the user inputs.
+        df = _filter(df,
+                     form.name.data if form.name.used else None,
+                     form.regions.data if form.regions.used else None,
+                     form.free.data if form.free.used else None)
+        df = _sort(df,
+                   [form.sortby1.data if form.sortby1.used else None,
+                    form.sortby2.data if form.sortby2.used else None,
+                    form.sortby3.data if form.sortby3.used else None])
+
+        # Add a rank number column.
+        n_total_rows = df.shape[0]
+        df = df.assign(rank=range(1, n_total_rows + 1))
+
+        # Limit the amount of results to the current page.
+        start_row = (page - 1) * _ROWS_PER_PAGE
+        df = df.iloc[start_row:start_row + _ROWS_PER_PAGE]
+
+        # Get the result away from Pandas so that we can release the lock.
+        rows = list(df.itertuples())
+
+        return cluster_size, n_total_rows, rows
 
 
 def _filter(df, name_filter: Optional[str], region_filter: Optional[List[int]], free_filter: Optional[bool]):

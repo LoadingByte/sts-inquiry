@@ -1,33 +1,49 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="utf-8"/>
-  <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="style.css") }}"/>
-  <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="stw.css") }}"/>
-  <link rel="icon" type="image/png" href="{{ url_for("static", filename="favicon.png") }}"/>
-  <script src="{{ url_for("static", filename="script.js") }}"></script>
-  <title>StellwerkSim Inquiry</title>
-</head>
-<body>
-
-<header>
-  <h1>StellwerkSim Inquiry</h1>
+{% macro page_controls() %}
   <p>
-    Die leistungsstarke Stellwerksuche für den
-    <a href="{{ sts_url }}" target="_blank">StellwerkSim</a>.
+    {% if prev_pages|length > 0 %}
+      {{ page_link(prev_pages[-1], "<") }}
+      &nbsp;
+      {{ page_controls_one_side(prev_pages) }}
+    {% endif %}
+    &nbsp;
+    Seite {{ cur_page }}
+    &nbsp;
+    {% if next_pages|length > 0 %}
+      {{ page_controls_one_side(next_pages) }}
+      &nbsp;
+      {{ page_link(next_pages[0], ">") }}
+    {% endif %}
   </p>
-</header>
+{% endmacro -%}
 
-{% macro stw_core_box(stw) %}
+{%- macro page_controls_one_side(pages) %}
+  {% for page in pages[:5] %}
+    {{ page_link(page, page) }}
+  {% endfor %}
+  {% if pages|length > 10 %}
+    &hellip;
+  {% endif %}
+  {% for page in pages[5:][-5:] %}
+    {{ page_link(page, page) }}
+  {% endfor %}
+{% endmacro -%}
+
+{%- macro page_link(page, text) %}
+  <a href="{{ url_for("index") ~ "?" ~ urlencode(search_params + [("page", page)]) }}">{{ text }}</a>
+{% endmacro -%}
+
+
+{%- macro stw_core_box(stw) %}
   <a href="{{ urljoin(sts_url, "anlagen.php?beta=on#stellwerk={}".format(stw.aid)) }}"
      target="_blank">{{ stw.name }}</a>
   <div class="stw-player-marker-wrapper">
     <div class="stw-player-marker" style="{{ "visibility: hidden" if not stw.occupants[0] }}"></div>
     <div class="stw-player-marker" style="{{ "visibility: hidden" if not stw.occupants[1] }}"></div>
   </div>
-{% endmacro %}
+{% endmacro -%}
 
-{% macro stw_with_tooltip(stw, style) %}
+
+{%- macro stw_with_tooltip(stw, style) %}
   <div class="stw" style="{{ style }}">
     {{ stw_core_box(stw) }}
     <div class="stw-tooltip-wrapper">
@@ -35,10 +51,12 @@
         {% set screenshot_url = urljoin(sts_url, "shot/see_{}.jpeg".format(stw.aid)) %}
         <a class="stw-tooltip-pic" href="{{ screenshot_url }}" target="_blank"
            title="Größeres Bild anzeigen">
-          <img src="{{ screenshot_url }}" alt="Screenshot des Stellwerks"/>
+          <noscript>
+            <img src="{{ screenshot_url }}" alt="Screenshot des Stellwerks"/>
+          </noscript>
         </a>
         {% if stw.latitude is not none and stw.longitude is not none %}
-          <div class="stw-tooltip-map-placeholder">
+          <div class="stw-tooltip-map-placeholder" style="display: none;">
             {# As soon as the user activates the tooltip, an iframe with this source URL will be created.
                It will have the class "stw-tooltip-map". #}
             {% set zoom = 0.01 %}
@@ -65,7 +83,28 @@
       </div>
     </div>
   </div>
-{% endmacro %}
+{% endmacro -%}
+
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="style.css") }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="stw.css") }}"/>
+  <link rel="icon" type="image/png" href="{{ url_for("static", filename="favicon.png") }}"/>
+  <script src="{{ url_for("static", filename="script.js") }}"></script>
+  <title>StellwerkSim Inquiry</title>
+</head>
+<body>
+
+<header>
+  <h1>StellwerkSim Inquiry</h1>
+  <p>
+    Die leistungsstarke Stellwerksuche für den
+    <a href="{{ sts_url }}" target="_blank">StellwerkSim</a>.
+  </p>
+</header>
 
 <main>
   <div class="form-wrapper">
@@ -104,17 +143,20 @@
     </form>
   </div>
 
-  <p>
-    {% if n_total_rows != rows|length %}
-      Es werden die ersten {{ rows|length }} von insgesamt {{ n_total_rows }} Ergebnissen angezeigt.
-    {% else %}
-      Es werden alle {{ n_total_rows }} Ergebnisse angezeigt.
-    {% endif %}
-  </p>
+  {% if n_total_rows != rows|length %}
+    {{ page_controls() }}
+    <p>
+      Es werden Ergebnisse {{ rows[0]["rank"] }} bis {{ rows[-1]["rank"] }}
+      von insgesamt {{ n_total_rows }} Ergebnissen angezeigt.
+    </p>
+  {% else %}
+    <p>Es werden alle {{ n_total_rows }} Ergebnisse angezeigt.</p>
+  {% endif %}
 
   <table>
     <thead>
     <tr>
+      <th>Rang</th>
       <th>{{ "Stellwerk" if cluster_size == 1 else "Cluster" }}</th>
       <th>Nachbarn</th>
       <th>Region</th>
@@ -143,6 +185,7 @@
     <tbody>
     {% for row in rows %}
       <tr>
+        <td>{{ row["rank"] }}</td>
         <td>
           {% set cluster = row["cluster"] %}
           {% if cluster_size == 1 %}
@@ -198,11 +241,15 @@
     {% endfor %}
     </tbody>
   </table>
+
+  {% if n_total_rows != rows|length %}
+    {{ page_controls() }}
+  {% endif %}
 </main>
 
 <footer>
   Mit ganz viel &hearts; gebaut von Felix Mujkanovic
-  (<a href="https://github.com/LoadingByte" target="_blank">LoadingByte</a>).<br/>
+  (<a href="https://loadingbyte.com/" target="_blank">LoadingByte</a>).<br/>
   Quellen sind verfügbar auf
   <a href="https://github.com/LoadingByte/sts-inquiry" target="_blank">GitHub</a>.
 </footer>

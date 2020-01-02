@@ -47,9 +47,8 @@ def _fetch_and_handle_errors(label, update_fn):
 def _update_landscape():
     world, dfs = run_landscape_pipeline()
 
-    cache.LOCK.acquire()
-    cache.update(world, dfs)
-    cache.LOCK.release()
+    with cache.LOCK:
+        cache.update(world, dfs)
 
 
 def _update_players():

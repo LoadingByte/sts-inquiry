@@ -25,11 +25,6 @@ header h1 {
 
 /* Form */
 
-input {
-    box-sizing: border-box; /* avoid overflow */
-    width: 100%;
-}
-
 .form-wrapper {
     display: table; /* as small as possible */
     margin: auto; /* center */
@@ -111,16 +106,28 @@ td {
     padding: 1.5em 0.5em;
 }
 
+/* Rank column */
+td:first-child {
+    font-size: 2em;
+    font-weight: bold;
+    color: #aaa;
+}
+
 /* Cluster column */
-td:nth-child(1) {
+td:nth-child(2) {
     padding-left: 1.5em;
     padding-right: 1.5em;
 }
 
 /* Neighbors and region columns */
-td:nth-child(2), td:nth-child(3) {
+td:nth-child(3), td:nth-child(4) {
     padding-left: 1em;
     padding-right: 1em;
+}
+
+/* Every column apart from the cluster one */
+th:not(:nth-child(2)), td:not(:nth-child(2)) {
+    text-align: center;
 }
 
 tbody tr:not(:first-child) td {
@@ -129,7 +136,6 @@ tbody tr:not(:first-child) td {
 
 th:not(:first-child), td:not(:first-child) {
     border-left: 1px dashed #ccc;
-    text-align: center;
 }
 
 .neighbor-wrapper {

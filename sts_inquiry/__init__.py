@@ -1,4 +1,4 @@
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlencode
 
 import numpy as np
 from flask import Flask
@@ -32,7 +32,8 @@ if app_root != "/":
 # Configure the template engine.
 app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
-app.jinja_env.globals.update(zip=zip, isnan=np.isnan, urljoin=urljoin, sts_url=app.config["STS_URL"])
+app.jinja_env.globals.update(zip=zip, isnan=np.isnan,
+                             urljoin=urljoin, urlencode=urlencode, sts_url=app.config["STS_URL"])
 
 # Initialize routes.
 from . import views
