@@ -11,11 +11,11 @@ _SORT_ORDERS = [("asc", "\u2B08 aufsteigend"), ("desc", "\u2B0A absteigend")]
 
 class SearchForm(FlaskForm):
     clustersize = SelectField("Clustergröße", coerce=int, default=1)
-    instance = SelectField("Instanz", coerce=int, default=-1,
-                           choices=[(-1, "-- Alle --")] + [(inst, str(inst)) for inst in INSTANCES])
 
     name = StringField("Stellwerkname")
     regions = SelectMultipleField("Regionen", coerce=int)
+    instance = SelectField("Instanz für #\U0001F464", coerce=int, default=-1,
+                           choices=[(-1, "-- Alle -- ")] + [(inst, str(inst)) for inst in INSTANCES])
     free = BooleanField("Stellwerke unbesetzt")
 
     sortby1 = SelectField("1. Stufe")

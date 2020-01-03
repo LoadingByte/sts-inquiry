@@ -120,13 +120,13 @@
         {{ form.clustersize.label }}
         {{ form.clustersize }}
       </div>
-      <div class="form-inst" style="grid-area: inst">
-        {{ form.instance.label }}
-        {{ form.instance }}
-      </div>
       <div class="form-name" style="grid-area: name">
         {{ form.name.label }}
         {{ form.name }}
+      </div>
+      <div class="form-inst" style="grid-area: inst">
+        {{ form.instance.label }}
+        {{ form.instance }}
       </div>
       <div class="form-free" style="grid-area: free">
         {{ form.free() }}
@@ -187,27 +187,27 @@
         {{ metric_col_labels["difent"] }}</abbr></th>
       <th><abbr title="Häufigste Spielzeit der Kommentare{{ ' für Stellwerke im Cluster' if multi }}">
         {{ metric_col_labels["mode_playing_time"] }}</abbr></th>
+      <th><abbr title="Instanzen, die die Suchanfrage am besten erfüllen">1|2</abbr></th>
+      <th><abbr title="Belegte Nachbarstellwerke {{ 'in Instanz {}'.format(instance) if instance else "pro Instanz" }}">
+        {{ metric_col_labels["nghbr_occupants"] }}</abbr></th>
       <th><abbr
-          title="{{ 'Falls unbesetzt: ' if instance }}Belegte Nachbarstellwerke {{ 'in Instanz {}'.format(instance) if instance else '(Maximum der unbesetzten Instanzen)' }}">
-        {{ metric_col_labels["nghbr_occupied"] }}</abbr></th>
-      <th><abbr
-          title="{{ 'Falls unbesetzt: ' if instance }}Maximal belegte andere Stellwerke in {{ 'einer der Regionen des Clusters' if multi else 'der Region des Stellwerks' }} ({{ 'in Instanz {}'.format(instance) if instance else 'Maximum der unbesetzten Instanzen' }})">
-        {{ metric_col_labels["region_occupied"] }}</abbr></th>
+          title="Maximal belegte andere Stellwerke in {{ ('einer der Regionen des Clusters' if multi else 'der Region des Stellwerks') }} {{ ('in Instanz {}'.format(instance) if instance else "pro Instanz") }}">
+        {{ metric_col_labels["region_occupants"] }}</abbr></th>
     </tr>
     </thead>
     <tbody>
     {% for row in rows %}
       <tr>
-        <td>{{ row["rank"] }}</td>
+        <td>{{ row.Index + 1 }}</td>
         <td>
-          {% set cluster = row["cluster"] %}
+          {% set cluster = row.cluster %}
           {% if cluster_size == 1 %}
             {{ stw_with_tooltip(cluster|first, "width: min-content; margin: auto") }}
           {% else %}
             <div class="stw-container">
               <svg class="stw-background" viewBox="-5 -3 110 39" preserveAspectRatio="none">
                 {% set coord_lookup = dict(zip(cluster, stw_coords)) %}
-                {% for edge in row["intra_edges"] %}
+                {% for edge in row.intra_edges %}
                   {% set stw_1_x, stw_1_y = coord_lookup[edge.fst()] %}
                   {% set stw_2_x, stw_2_y = coord_lookup[edge.snd()] %}
                   <line x1="{{ stw_1_x }}" y1="{{ stw_1_y / 3 }}" x2="{{ stw_2_x }}" y2="{{ stw_2_y / 3 }}"
@@ -224,7 +224,7 @@
         </td>
         <td>
           <div class="neighbor-wrapper">
-            {% for nghbr in row["neighbors"] %}
+            {% for nghbr in row.neighbors %}
               <div class="stw">
                 {{ stw_core_box(nghbr) }}
               </div>
@@ -233,22 +233,23 @@
         </td>
         <td>
           <ul>
-            {% for region in row["regions"] %}
+            {% for region in row.regions %}
               <li><a href="{{ urljoin(sts_url, "anlagen.php?beta=on#region={}".format(region.rid)) }}" target="_blank">
                 {{ region.name }}
               </a></li>
             {% endfor %}
           </ul>
         </td>
-        <td>{{ row["intra_handovers"] }}</td>
-        <td>{{ row["nghbr_handovers"] }}</td>
-        <td>{{ row["n_neighbors"] }}</td>
-        <td>{{ "{:.2f}".format(row["difficulty"]) if not isnan(row["difficulty"]) else "&ndash;"|safe }}</td>
-        <td>{{ "{:.2f}".format(row["entertainment"]) if not isnan(row["entertainment"]) else "&ndash;"|safe }}</td>
-        <td>{{ "{:.2f}".format(row["difent"]) if not isnan(row["difent"]) else "&ndash;"|safe }}</td>
-        <td>{{ row["mode_playing_time"] }}</td>
-        <td>{{ "{:.0f}".format(row["nghbr_occupied"]) if not isnan(row["nghbr_occupied"]) else "&ndash;"|safe }}</td>
-        <td>{{ "{:.0f}".format(row["region_occupied"]) if not isnan(row["region_occupied"]) else "&ndash;"|safe }}</td>
+        <td>{{ row.intra_handovers }}</td>
+        <td>{{ row.nghbr_handovers }}</td>
+        <td>{{ row.n_neighbors }}</td>
+        <td>{{ "{:.2f}".format(row.difficulty) if not isnan(row.difficulty) else "&ndash;"|safe }}</td>
+        <td>{{ "{:.2f}".format(row.entertainment) if not isnan(row.entertainment) else "&ndash;"|safe }}</td>
+        <td>{{ "{:.2f}".format(row.difent) if not isnan(row.difent) else "&ndash;"|safe }}</td>
+        <td>{{ row.mode_playing_time }}</td>
+        <td>{{ row.instance }}</td>
+        <td>{{ row.nghbr_occupants }}</td>
+        <td>{{ row.region_occupants }}</td>
       </tr>
     {% endfor %}
     </tbody>

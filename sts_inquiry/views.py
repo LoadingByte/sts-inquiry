@@ -1,5 +1,4 @@
 import math
-from typing import Optional, List
 from urllib.parse import urlencode
 
 import numpy as np
@@ -7,6 +6,7 @@ from flask import request, url_for, abort, redirect, render_template
 
 from sts_inquiry import app, cache
 from sts_inquiry.forms import create_search_form
+from sts_inquiry.search import search
 
 METRIC_COL_LABELS = {
     "intra_handovers": "#C\U0001F517",
@@ -16,8 +16,8 @@ METRIC_COL_LABELS = {
     "entertainment": "\u2300\U0001F3A2",
     "difent": "\u2300\u2300\U0001F92F\U0001F3A2",
     "mode_playing_time": "\u2300\u23F3",
-    "nghbr_occupied": "#N\U0001F464",
-    "region_occupied": "#R\U0001F464"
+    "nghbr_occupants": "#N\U0001F464",
+    "region_occupants": "#R\U0001F464"
 }
 
 _ROWS_PER_PAGE = app.config["ROWS_PER_PAGE"]
@@ -61,7 +61,7 @@ def index():
     except (KeyError, TypeError):
         page = 1
 
-    cluster_size, n_total_rows, rows = _search(form, page)
+    cluster_size, n_total_rows, rows = search(form, page)
 
     # Catch too high page numbers.
     if not rows and page != 1:
@@ -83,77 +83,6 @@ def index():
                            instance=form.instance.data if form.instance.used else None,
                            rows=rows, n_total_rows=n_total_rows,
                            search_params=search_params, cur_page=page, prev_pages=prev_pages, next_pages=next_pages)
-
-
-def _search(form, page: int):
-    with cache.LOCK:
-        # Get the appropriate df for the selected cluster size.
-        cluster_size = form.clustersize.data
-        df = cache.dfs[cluster_size - 1]
-
-        # Pick the appropriate player-related columns for the selected instance.
-        inst = form.instance.data if form.instance.used else "max"
-        df = df.rename(columns={f"free_{inst}": "free",
-                                f"nghbr_occupied_{inst}": "nghbr_occupied",
-                                f"region_occupied_{inst}": "region_occupied"})
-
-        # Filter and sort the df according to the user inputs.
-        df = _filter(df,
-                     form.name.data if form.name.used else None,
-                     form.regions.data if form.regions.used else None,
-                     form.free.data if form.free.used else None)
-        df = _sort(df, cluster_size,
-                   [form.sortby1.data if form.sortby1.used else None,
-                    form.sortby2.data if form.sortby2.used else None,
-                    form.sortby3.data if form.sortby3.used else None])
-
-        # Add a rank number column.
-        n_total_rows = df.shape[0]
-        df = df.assign(rank=range(1, n_total_rows + 1))
-
-        # Limit the amount of results to the current page.
-        start_row = (page - 1) * _ROWS_PER_PAGE
-        df = df.iloc[start_row:start_row + _ROWS_PER_PAGE]
-
-        # Get the result away from Pandas so that we can release the lock.
-        rows = list(df.itertuples())
-
-        return cluster_size, n_total_rows, rows
-
-
-def _filter(df, name_filter: Optional[str], region_filter: Optional[List[int]], free_filter: Optional[bool]):
-    if free_filter:
-        df = df[df["free"]]
-
-    if name_filter:
-        df = df[df["concat_names"].str.contains(name_filter, case=False, regex=False)]
-
-    if region_filter:
-        region_filter = set(region_filter)  # hopefully, computing this first is better for performance.
-        df = df[[len({reg.rid for reg in regions}.intersection(region_filter)) > 0
-                 for regions in df["regions"]]]
-
-    return df
-
-
-def _sort(df, cluster_size: int, sort_bys: Optional[List[str]]):
-    sort_cols, sort_orders = [], []
-    for sort_by in sort_bys:
-        if sort_by:
-            sort_col, sort_order = sort_by.split("-")
-            if sort_col == "mode_playing_time":
-                sort_col = "mode_playing_time_ordinal"
-            sort_cols.append(sort_col)
-            sort_orders.append(sort_order == "asc")
-
-    if cluster_size == 1:
-        sort_cols.append("concat_names")
-        sort_orders.append("asc")
-
-    if sort_cols:
-        df = df.sort_values(sort_cols, ascending=sort_orders)
-
-    return df
 
 
 _HARDCODED_STW_COORDS = {
