@@ -48,37 +48,44 @@
     {{ stw_core_box(stw) }}
     <div class="stw-tooltip-wrapper">
       <div class="stw-tooltip">
-        {% set screenshot_url = urljoin(sts_url, "shot/see_{}.jpeg".format(stw.aid)) %}
-        <a class="stw-tooltip-pic" href="{{ screenshot_url }}" target="_blank"
-           title="Größeres Bild anzeigen">
-          <noscript>
-            <img src="{{ screenshot_url }}" alt="Screenshot des Stellwerks"/>
-          </noscript>
-        </a>
-        {% if stw.latitude is not none and stw.longitude is not none %}
-          <div class="stw-tooltip-map-placeholder" style="display: none;">
-            {# As soon as the user activates the tooltip, an iframe with this source URL will be created.
-               It will have the class "stw-tooltip-map". #}
-            {% set zoom = 0.01 %}
-            https://www.openstreetmap.org/export/embed.html?bbox={{ stw.longitude - zoom }}%2C{{ stw.latitude - zoom }}%2C{{ stw.longitude + zoom }}%2C{{ stw.latitude + zoom }}
-          </div>
-          <a class="stw-tooltip-map-link" target="_blank"
-             href="https://www.openrailwaymap.org/?lat={{ stw.latitude }}&lon={{ stw.longitude }}&zoom=15&style=standard">
-            Größere Karte anzeigen
+        <div class="stw-tooltip-col-1">
+          {% set screenshot_url = urljoin(sts_url, "shot/see_{}.jpeg".format(stw.aid)) %}
+          <a href="{{ screenshot_url }}" target="_blank"
+             title="Größeres Bild anzeigen">
+            <noscript>
+              <img src="{{ screenshot_url }}" alt="Screenshot des Stellwerks"/>
+            </noscript>
           </a>
-        {% endif %}
-        <div class="stw-tooltip-num-labels">Schwierigkeitsgrad:<br/>Unterhaltungsfaktor:</div>
-        <div class="stw-tooltip-nums">
-          {{ stw.difficulty or "&ndash;"|safe }}<br/>
-          {{ stw.entertainment or "&ndash;"|safe }}
-        </div>
-        <div class="stw-tooltip-comment-wrapper">
-          {% for comment in stw.comments %}
-            <div class="stw-tooltip-comment">
-              {{ comment.text }}
-              <div>({{ comment.playing_time }})</div>
+          {% if stw.latitude is not none and stw.longitude is not none %}
+            <div class="stw-tooltip-map-placeholder" style="display: none;">
+              {# As soon as the user activates the tooltip, an iframe with this source URL will be created. #}
+              {% set zoom = 0.01 %}
+              https://www.openstreetmap.org/export/embed.html?bbox={{ stw.longitude - zoom }}%2C{{ stw.latitude - zoom }}%2C{{ stw.longitude + zoom }}%2C{{ stw.latitude + zoom }}
             </div>
-          {% endfor %}
+            <a class="stw-tooltip-map-link" target="_blank"
+               href="https://www.openrailwaymap.org/?lat={{ stw.latitude }}&lon={{ stw.longitude }}&zoom=15&style=standard">
+              Größere Karte anzeigen
+            </a>
+          {% endif %}
+        </div>
+        <div class="stw-tooltip-col-2">
+          <div class="stw-tooltip-nums">
+            <div>Schwierigkeitsgrad:</div>
+            <div>Unterhaltungsfaktor:</div>
+            <div>{{ stw.difficulty or "&ndash;"|safe }}</div>
+            <div>{{ stw.entertainment or "&ndash;"|safe }}</div>
+          </div>
+          <div class="stw-tooltip-comment-wrapper">
+            {% for comment in stw.comments %}
+              <div class="stw-tooltip-comment">
+                {{ comment.text }}
+                <div>&nbsp;({{ comment.playing_time }})</div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="stw-tooltip-description">
+          {{ stw.description }}
         </div>
       </div>
     </div>

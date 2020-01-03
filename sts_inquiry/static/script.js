@@ -17,7 +17,6 @@ window.addEventListener("load", function () {
                 if (mapPlaceholder) {
                     const url = mapPlaceholder.textContent;
                     const iframe = document.createElement("iframe");
-                    iframe.setAttribute("class", "stw-tooltip-map");
                     iframe.setAttribute("src", url);
                     mapPlaceholder.parentNode.replaceChild(iframe, mapPlaceholder);
                 }

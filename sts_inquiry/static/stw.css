@@ -19,7 +19,6 @@
     visibility: visible; /* reset the stw-parent's visibility. */
     position: relative; /* for the tooltip z-index */
 
-    font-size: 0.9em;
     background-color: #ffe;
     border: 2px solid #7f7f7f;
     box-shadow: 0 0 2px #aaa;
@@ -39,6 +38,7 @@
     white-space: nowrap;
     text-decoration: inherit; /* disable link underline */
 
+    font-size: 0.9em;
     /* Narrower font */
     font-family: "Open Sans Condensed", "Helvetica Narrow", "Arial Narrow", "Open Sans",
     Helvetica, Arial, sans-serif;
@@ -71,60 +71,54 @@
 }
 
 .stw-tooltip {
-    margin: 0.5em;
-    min-height: 30em;
+    margin: 0.7em;
+    font-size: 0.8em;
 
+    /* Three column layout */
     display: grid;
-    grid-template-columns: 20em auto 8em;
+    grid-template-columns: 20em 20em 20em;
+    grid-template-rows: minmax(0, 30em);
     grid-gap: 1em;
-    /* @formatter:off */
-    grid-template-areas:
-        "pic lbl num"
-        "pic cmt cmt"
-        "map cmt cmt"
-        "lnk cmt cmt"
-        ".   cmt cmt";
-    /* @formatter:on */
-
-    font-size: 0.9em;
 }
 
-.stw-tooltip-pic {
-    grid-area: pic;
+/* These columns have multiple elements that stack vertically. */
+.stw-tooltip-col-1, .stw-tooltip-col-2 {
+    display: flex;
+    flex-direction: column;
 }
 
-.stw-tooltip-pic img {
+/* Tooltip column 1 */
+
+.stw-tooltip-col-1 > *:not(:first-child) {
+    margin-top: 0.5em;
+}
+
+.stw-tooltip-col-1 img {
     width: 100%;
 }
 
-.stw-tooltip-map {
-    grid-area: map;
+.stw-tooltip-col-1 iframe {
     width: 100%;
-    height: 20em;
+    height: 100%;
     border: None;
 }
 
 .stw-tooltip-map-link {
-    grid-area: lnk;
     text-align: center;
 }
 
-.stw-tooltip-num-labels {
-    grid-area: lbl;
-}
+/* Tooltip column 2 */
 
 .stw-tooltip-nums {
-    grid-area: num;
+    display: grid;
+    grid-template: auto auto / auto auto;
+    grid-auto-flow: column;
+    grid-gap: 0.5em 1em;
+
+    margin-bottom: 2em;
 }
 
-.stw-tooltip-comment-wrapper {
-    grid-area: cmt;
-    max-height: 30em; /* this is a good value for most heights of stw screenshots */
-    overflow-y: auto; /* y scrolling */
-    padding-right: 0.5em; /* padding between this and the scrollbar */
-}
-
-.stw-tooltip-comment {
+.stw-tooltip-comment:not(:first-child) {
     margin-top: 0.8em;
 }
 
@@ -142,4 +136,22 @@
     visibility: hidden;
     content: ".";
     height: 0;
+}
+
+/* Tooltip column 3 */
+
+.stw-tooltip-description > p:first-child {
+    margin-top: 0;
+}
+
+.stw-tooltip-description > p:last-child {
+    margin-bottom: 0;
+}
+
+/* Scrollable wrappers in tooltip columns 2 and 3 */
+
+.stw-tooltip-comment-wrapper, .stw-tooltip-description {
+    height: 100%;
+    overflow-y: auto; /* y scrolling */
+    padding-right: 0.5em; /* padding between this and the scrollbar */
 }
