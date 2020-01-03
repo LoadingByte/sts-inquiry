@@ -25,7 +25,7 @@ class SearchForm(FlaskForm):
     submit = SubmitField("\U0001F50D\u00A0\u00A0Suchen")
 
     def mark_used_fields(self):
-        self.clustersize.used = True
+        self.clustersize.used = self.clustersize.validate(self) and self.clustersize.data != 1
         self.instance.used = self.instance.validate(self) and self.instance.data != -1
         self.name.used = self.name.validate(self) and self.name.data.strip() != ""
         self.regions.used = self.regions.validate(self) and -1 not in self.regions.data
