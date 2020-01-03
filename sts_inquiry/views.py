@@ -63,6 +63,10 @@ def index():
 
     cluster_size, n_total_rows, rows = _search(form, page)
 
+    # Catch too high page numbers.
+    if not rows and page != 1:
+        return redirect(url_for("index") + "?" + urlencode(search_params), 302)
+
     prev_pages = list(range(1, page))
     next_pages = list(range(page + 1, math.ceil(n_total_rows / _ROWS_PER_PAGE) + 1))
 
