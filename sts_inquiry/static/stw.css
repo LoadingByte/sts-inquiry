@@ -111,7 +111,7 @@
 
 .stw-tooltip-nums {
     display: grid;
-    grid-template: auto auto / auto auto;
+    grid-template: auto auto / min-content auto;
     grid-auto-flow: column;
     grid-gap: 0.5em 1em;
 
