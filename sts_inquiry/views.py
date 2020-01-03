@@ -102,7 +102,7 @@ def _search(form, page: int):
                      form.name.data if form.name.used else None,
                      form.regions.data if form.regions.used else None,
                      form.free.data if form.free.used else None)
-        df = _sort(df,
+        df = _sort(df, cluster_size,
                    [form.sortby1.data if form.sortby1.used else None,
                     form.sortby2.data if form.sortby2.used else None,
                     form.sortby3.data if form.sortby3.used else None])
@@ -136,7 +136,7 @@ def _filter(df, name_filter: Optional[str], region_filter: Optional[List[int]], 
     return df
 
 
-def _sort(df, sort_bys: Optional[List[str]]):
+def _sort(df, cluster_size: int, sort_bys: Optional[List[str]]):
     sort_cols, sort_orders = [], []
     for sort_by in sort_bys:
         if sort_by:
@@ -145,6 +145,10 @@ def _sort(df, sort_bys: Optional[List[str]]):
                 sort_col = "mode_playing_time_ordinal"
             sort_cols.append(sort_col)
             sort_orders.append(sort_order == "asc")
+
+    if cluster_size == 1:
+        sort_cols.append("concat_names")
+        sort_orders.append("asc")
 
     if sort_cols:
         df = df.sort_values(sort_cols, ascending=sort_orders)
