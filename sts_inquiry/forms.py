@@ -44,7 +44,7 @@ def create_search_form(args,
     form.clustersize.choices = [(sz, str(sz)) for sz in cluster_sizes]
 
     form.regions.choices = [(-1, "-- Alle --")] + \
-                           [(region.rid, region.name) for region in regions]
+                           [(region.rid, region.name) for region in sorted(regions, key=lambda r: r.name.lower())]
     # Hacky way to set the default region ("all"); necessary because wtforms does wtf and defaults don't work here.
     if not form.regions.data:
         form.regions.data = [-1]
