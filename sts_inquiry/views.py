@@ -23,6 +23,11 @@ METRIC_COL_LABELS = {
 _ROWS_PER_PAGE = app.config["ROWS_PER_PAGE"]
 
 
+@app.errorhandler(503)
+def error(_):
+    return render_template("503.html"), 503
+
+
 @app.route("/")
 def index():
     if not cache.ready:
