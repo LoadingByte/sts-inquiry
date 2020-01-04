@@ -104,22 +104,13 @@ table {
 
 th {
     padding: 1em 0.5em;
-    background-color: #f5f5f5;
+    background-color: white;
     border-bottom: 2px solid black;
-    border-top: 2px solid black;
 
     /* Sticky table header */
     position: sticky;
     top: 0;
     z-index: 2;
-}
-
-th:first-child {
-    border-left: 2px solid black;
-}
-
-th:last-child {
-    border-right: 2px solid black;
 }
 
 /* Default padding for most columns */
@@ -156,8 +147,12 @@ th:not(:nth-child(2)), td:not(:nth-child(2)) {
     text-align: center;
 }
 
+tbody tr:nth-child(2n + 1) td {
+    background-color: #fdfdfd;
+}
+
 tbody tr:nth-child(2n) td {
-    background-color: #fcfcfc;
+    background-color: #f8f8f8;
 }
 
 tbody tr:not(:first-child) td {
