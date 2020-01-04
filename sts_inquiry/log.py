@@ -9,7 +9,7 @@ def setup_logging(log_dir):
     os.makedirs(log_dir, exist_ok=True)
     dictConfig({
         "version": 1,
-        "disable_existing_loggers": True,
+        "disable_existing_loggers": False,
         "formatters": {
             "default": {
                 "format": "%(asctime)s %(name)-11s %(levelname)-8s %(message)s"
