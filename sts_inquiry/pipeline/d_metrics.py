@@ -1,5 +1,7 @@
 import logging
-from statistics import mean, mode, StatisticsError
+from itertools import groupby
+from operator import itemgetter
+from statistics import mean, StatisticsError
 from typing import Iterable, Iterator, Collection, List, Set, FrozenSet
 
 import pandas as pd
@@ -31,7 +33,8 @@ def landscape_metrics(all_clusters: Iterable[Set[FrozenSet[Stw]]]) -> Iterator[p
 
         col_difficulty = [_statistic(mean, (stw.difficulty for stw in cluster)) for cluster in clusters]
         col_entertainment = [_statistic(mean, (stw.entertainment for stw in cluster)) for cluster in clusters]
-        col_mode_playing_time = [_statistic(mode, (cmt.playing_time for stw in cluster for cmt in stw.comments))
+        col_mode_playing_time = [_statistic(_quasi_mode_playing_time,
+                                            (cmt.playing_time for stw in cluster for cmt in stw.comments))
                                  for cluster in clusters]
 
         cols = {
@@ -72,6 +75,12 @@ def _intra_or_nghbr_edges(intra_or_nghbr: str, cluster: FrozenSet[Stw]) -> Set[E
     return {Edge(frozenset({stw, nghbr.stw}), nghbr.handover)
             for stw in cluster for nghbr in stw.neighbors
             if (nghbr.stw in cluster) == intra_or_nghbr}
+
+
+def _quasi_mode_playing_time(playing_times):
+    pt_ords = (PLAYING_TIME_ORDER_ASC.index(pt) for pt in playing_times)
+    counts = [(ordi, sum(1 for _ in grp)) for ordi, grp in groupby(sorted(pt_ords))]
+    return PLAYING_TIME_ORDER_ASC[max(counts[::-1], key=itemgetter(1))[0]]
 
 
 def player_metrics(dfs: List[pd.DataFrame]):
