@@ -148,10 +148,6 @@ th:not(:nth-child(2)), td:not(:nth-child(2)) {
 }
 
 tbody tr:nth-child(2n + 1) td {
-    background-color: #fdfdfd;
-}
-
-tbody tr:nth-child(2n) td {
     background-color: #f8f8f8;
 }
 
@@ -175,6 +171,7 @@ th:not(:first-child), td:not(:first-child) {
 }
 
 ul {
+    margin: 0;
     padding-left: 0;
     list-style: none;
 }

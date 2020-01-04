@@ -157,7 +157,7 @@
   {% if n_total_rows != rows|length %}
     {{ page_controls() }}
     <p>
-      Es werden Ergebnisse {{ rows[0]["rank"] }} bis {{ rows[-1]["rank"] }}
+      Es werden Ergebnisse {{ rows[0].Index + 1 }} bis {{ rows[-1].Index + 1 }}
       von insgesamt {{ n_total_rows }} Ergebnissen angezeigt.
     </p>
   {% else %}
@@ -172,26 +172,26 @@
       <th>{{ "Cluster" if multi else "Stellwerk" }}</th>
       <th>Nachbarn</th>
       <th>Region</th>
-      <th><abbr title="Direkte Übergabepunkte{{ ' im Cluster' if multi }}">
+      <th><abbr title="Direkte Übergabepunkte im Cluster{{ " (immer 0, da Clustergröße 1)" if not multi }}">
         {{ metric_col_labels["intra_handovers"] }}</abbr></th>
       <th><abbr title="Direkte Übergabepunkte mit Nachbarstellwerken">
         {{ metric_col_labels["nghbr_handovers"] }}</abbr></th>
       <th><abbr title="Nachbarstellwerke">
         {{ metric_col_labels["n_neighbors"] }}</abbr></th>
-      <th><abbr title="{{ 'Durchschnittlicher ' if multi }}Schwierigkeitsgrad{{ ' im Cluster' if multi }}">
+      <th><abbr title="{{ "Durchschnittlicher " if multi }}Schwierigkeitsgrad{{ " im Cluster" if multi }}">
         {{ metric_col_labels["difficulty"] }}</abbr></th>
-      <th><abbr title="{{ 'Durchschnittlicher ' if multi }}Unterhaltungsfaktor{{ ' im Cluster' if multi }}">
+      <th><abbr title="{{ "Durchschnittlicher " if multi }}Unterhaltungsfaktor{{ " im Cluster" if multi }}">
         {{ metric_col_labels["entertainment"] }}</abbr></th>
       <th><abbr
-          title="Durchschnitt des {{ 'durchschnittlichen ' if multi }}Schwierigkeitsgrads und Unterhaltungsfaktors{{ ' im Cluster' if multi }}">
+          title="Durchschnitt des {{ "durchschnittlichen " if multi }}Schwierigkeitsgrads und Unterhaltungsfaktors{{ " im Cluster" if multi }}">
         {{ metric_col_labels["difent"] }}</abbr></th>
-      <th><abbr title="Häufigste Spielzeit der Kommentare{{ ' für Stellwerke im Cluster' if multi }}">
+      <th><abbr title="Häufigste Spielzeit der Kommentare{{ " für Stellwerke im Cluster" if multi }}">
         {{ metric_col_labels["mode_playing_time"] }}</abbr></th>
       <th><abbr title="Instanzen, die die Suchanfrage am besten erfüllen">1|2</abbr></th>
-      <th><abbr title="Belegte Nachbarstellwerke {{ 'in Instanz {}'.format(instance) if instance else "pro Instanz" }}">
+      <th><abbr title="Belegte Nachbarstellwerke {{ "in Instanz {}".format(instance) if instance else "pro Instanz" }}">
         {{ metric_col_labels["nghbr_occupants"] }}</abbr></th>
       <th><abbr
-          title="Maximal belegte andere Stellwerke in {{ ('einer der Regionen des Clusters' if multi else 'der Region des Stellwerks') }} {{ ('in Instanz {}'.format(instance) if instance else "pro Instanz") }}">
+          title="{{ 'Maximal b' if multi else 'B' }}elegte andere Stellwerke in {{ ("einer der Regionen des Clusters" if multi else "der Region des Stellwerks") }} {{ ("in Instanz {}".format(instance) if instance else "pro Instanz") }}">
         {{ metric_col_labels["region_occupants"] }}</abbr></th>
     </tr>
     </thead>
@@ -246,7 +246,7 @@
         <td>{{ "{:.2f}".format(row.difficulty) if not isnan(row.difficulty) else "&ndash;"|safe }}</td>
         <td>{{ "{:.2f}".format(row.entertainment) if not isnan(row.entertainment) else "&ndash;"|safe }}</td>
         <td>{{ "{:.2f}".format(row.difent) if not isnan(row.difent) else "&ndash;"|safe }}</td>
-        <td>{{ row.mode_playing_time }}</td>
+        <td>{{ row.mode_playing_time if row.mode_playing_time else "&ndash;"|safe }}</td>
         <td>{{ row.instance }}</td>
         <td>{{ row.nghbr_occupants }}</td>
         <td>{{ row.region_occupants }}</td>
