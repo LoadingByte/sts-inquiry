@@ -79,7 +79,9 @@
             {% for comment in stw.comments %}
               <div class="stw-tooltip-comment">
                 {{ comment.text }}
-                <div>&nbsp;({{ comment.playing_time }})</div>
+                {% if comment.playing_time %}
+                  <div>&nbsp;({{ comment.playing_time }})</div>
+                {% endif %}
               </div>
             {% endfor %}
           </div>
