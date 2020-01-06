@@ -17,8 +17,11 @@
 .stw {
     visibility: visible; /* reset the stw-parent's visibility. */
     position: relative; /* for the tooltip z-index */
-    width: min-content;
     min-width: 3.5em; /* so that there is definitely enough space for the small duration text in the player markers */
+
+    /* For the case when cluster size = 1 */
+    margin: auto;
+    width: min-content;
 
     background-color: #ffe;
     border: 2px solid #7f7f7f;
