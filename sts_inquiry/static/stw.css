@@ -57,10 +57,9 @@
 }
 
 .stw-player-marker-occupied {
-    /* Disallow Open Sans because that font has a strange padding at the top. */
-    font-family: Helvetica, Arial, sans-serif;
     font-size: 10px;
     font-weight: bold;
+    line-height: 10px;
     text-align: center;
     color: white;
     background-color: #cd00af;

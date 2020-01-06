@@ -1,0 +1,64 @@
+@font-face {
+    font-family: "Open Sans";
+    font-style: normal;
+    font-weight: 400;
+    /* @formatter:off */
+    src:
+        local("Open Sans Regular"),
+        local("OpenSans-Regular"),
+        url("fonts/Open_Sans_400.woff") format("woff"),
+        url("fonts/Open_Sans_400.woff2") format("woff2");
+    /* @formatter:on */
+}
+
+@font-face {
+    font-family: "Open Sans";
+    font-style: italic;
+    font-weight: 400;
+    /* @formatter:off */
+    src:
+        local("Open Sans Italic"),
+        local("OpenSans-Italic"),
+        url("fonts/Open_Sans_400italic.woff") format("woff"),
+        url("fonts/Open_Sans_400italic.woff2") format("woff2");
+    /* @formatter:on */
+}
+
+@font-face {
+    font-family: "Open Sans";
+    font-style: normal;
+    font-weight: 700;
+    /* @formatter:off */
+    src:
+        local("Open Sans Bold"),
+        local("OpenSans-Bold"),
+        url("fonts/Open_Sans_700.woff") format("woff"),
+        url("fonts/Open_Sans_700.woff2") format("woff2");
+    /* @formatter:on */
+}
+
+@font-face {
+    font-family: "Open Sans";
+    font-style: italic;
+    font-weight: 700;
+    /* @formatter:off */
+    src:
+        local("Open Sans Bold Italic"),
+        local("OpenSans-BoldItalic"),
+        url("fonts/Open_Sans_700italic.woff") format("woff"),
+        url("fonts/Open_Sans_700italic.woff2") format("woff2");
+    /* @formatter:on */
+}
+
+@font-face {
+    font-family: "Open Sans Condensed";
+    font-style: normal;
+    font-weight: 300;
+    /* @formatter:off */
+    src:
+        local("Open Sans Condensed Light"),
+        local("OpenSansCondensed-Light"),
+        url("fonts/Open_Sans_Condensed_300.woff") format("woff"),
+        url("fonts/Open_Sans_Condensed_300.woff2") format("woff2");
+    /* @formatter:on */
+}

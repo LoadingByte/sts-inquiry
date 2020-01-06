@@ -1,11 +1,12 @@
-a {
-    color: black;
-}
-
 body {
     margin: 0;
-    padding: 1em 4vw;
+    padding: 0 4vw;
+    /* Even though Open Sans is embedded as a webfont, provide other sans-serif fonts as fallbacks. */
     font-family: "Open Sans", Helvetica, Arial, sans-serif;
+}
+
+a {
+    color: black;
 }
 
 /* Header */
