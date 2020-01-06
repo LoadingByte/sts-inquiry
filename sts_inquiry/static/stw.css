@@ -17,7 +17,8 @@
 .stw {
     visibility: visible; /* reset the stw-parent's visibility. */
     position: relative; /* for the tooltip z-index */
-    min-width: 3em; /* so that there is definitely enough space for the small duration text in the player markers */
+    width: min-content;
+    min-width: 3.5em; /* so that there is definitely enough space for the small duration text in the player markers */
 
     background-color: #ffe;
     border: 2px solid #7f7f7f;
@@ -51,7 +52,7 @@
 }
 
 .stw-player-marker-free, .stw-player-marker-occupied {
-    width: 45%;
+    width: 44%;
     height: 10px;
     border: 1px solid #ddd;
 }

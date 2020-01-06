@@ -227,7 +227,7 @@
         <td>
           {% set cluster = row.cluster %}
           {% if cluster_size == 1 %}
-            {{ stw_with_tooltip(cluster|first, "width: min-content; margin: auto") }}
+            {{ stw_with_tooltip(cluster|first) }}
           {% else %}
             <div class="stw-container" style="{{ stw_container_dims }}">
               <svg class="stw-background" viewBox="-5 -3 110 39" preserveAspectRatio="none">
