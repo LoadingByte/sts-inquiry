@@ -15,7 +15,7 @@ METRIC_COL_LABELS = {
     "difficulty": "\u2300\U0001F92F",
     "entertainment": "\u2300\U0001F3A2",
     "difent": "\u2300\u2300\U0001F92F\U0001F3A2",
-    "mode_playing_time": "\u2300\u23F3",
+    "mode_playing_duration": "\u2300\u23F3",
     "nghbr_occupants": "#N\U0001F464",
     "region_occupants": "#R\U0001F464"
 }

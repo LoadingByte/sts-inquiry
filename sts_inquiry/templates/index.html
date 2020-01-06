@@ -79,9 +79,7 @@
             {% for comment in stw.comments %}
               <div class="stw-tooltip-comment">
                 {{ comment.text }}
-                {% if comment.playing_time %}
-                  <div>&nbsp;({{ comment.playing_time }})</div>
-                {% endif %}
+                <div>&nbsp;({{ comment.playing_duration ~ ", " if comment.playing_duration }}{{ comment.year }})</div>
               </div>
             {% endfor %}
           </div>
@@ -188,7 +186,7 @@
           title="Durchschnitt des {{ "durchschnittlichen " if multi }}Schwierigkeitsgrads und Unterhaltungsfaktors{{ " im Cluster" if multi }}">
         {{ metric_col_labels["difent"] }}</abbr></th>
       <th><abbr title="Häufigste Spielzeit der Kommentare{{ " für Stellwerke im Cluster" if multi }}">
-        {{ metric_col_labels["mode_playing_time"] }}</abbr></th>
+        {{ metric_col_labels["mode_playing_duration"] }}</abbr></th>
       <th><abbr title="Instanzen, die die Suchanfrage am besten erfüllen">1|2</abbr></th>
       <th><abbr title="Belegte Nachbarstellwerke {{ "in Instanz {}".format(instance) if instance else "pro Instanz" }}">
         {{ metric_col_labels["nghbr_occupants"] }}</abbr></th>

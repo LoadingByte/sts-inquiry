@@ -12,7 +12,7 @@ from lxml import html
 from markupsafe import Markup
 
 from sts_inquiry import app
-from sts_inquiry.consts import PLAYING_TIME_CONVERSION
+from sts_inquiry.consts import PLAYING_DURATION_CONVERSION
 from sts_inquiry.structs import Region, Comment
 
 _STS_URL = app.config["STS_URL"]
@@ -162,14 +162,17 @@ def _fetch_comments(session: requests.Session, forum_id: str) -> Iterator[Commen
     page = html.fromstring(resp.content)
 
     # Note: We skip the first comment since it's just saying that this thread is a shoutbox.
-    posts = [post.xpath("text()") for post in page.xpath("//div[@class='postbody']")[1:]]
+    posts = [(post.xpath("text()"),
+              post.xpath("ancestor::table//b[text()='Verfasst:']/parent::div/text()")[0])
+             for post in page.xpath("//div[@class='postbody']")[1:]]
 
-    for post in posts:
-        playing_time = None
-        if post[-1].startswith("Spieldauer:"):
-            playing_time = PLAYING_TIME_CONVERSION[post[-1]]
-            post = post[:-1]
-        yield Comment(text=" ".join(post), playing_time=playing_time)
+    for content, time in posts:
+        playing_duration = None
+        if content[-1].startswith("Spieldauer:"):
+            playing_duration = PLAYING_DURATION_CONVERSION[content[-1]]
+            content = content[:-1]
+        year = int(re.findall(r"\d{4}", time)[0])
+        yield Comment(text=" ".join(content), playing_duration=playing_duration, year=year)
 
 
 @dataclass(frozen=True)

@@ -6,7 +6,7 @@ from typing import Iterable, Iterator, Collection, List, Set, FrozenSet
 
 import pandas as pd
 
-from sts_inquiry.consts import INSTANCES, PLAYING_TIME_ORDER_ASC
+from sts_inquiry.consts import INSTANCES, PLAYING_DURATION_ORDER_ASC
 from sts_inquiry.structs import Edge, Stw
 
 log = logging.getLogger("sts-inquiry")
@@ -33,9 +33,9 @@ def landscape_metrics(all_clusters: Iterable[Set[FrozenSet[Stw]]]) -> Iterator[p
 
         col_difficulty = [_statistic(mean, (stw.difficulty for stw in cluster)) for cluster in clusters]
         col_entertainment = [_statistic(mean, (stw.entertainment for stw in cluster)) for cluster in clusters]
-        col_mode_playing_time = [_statistic(_quasi_mode_playing_time,
-                                            (cmt.playing_time for stw in cluster for cmt in stw.comments))
-                                 for cluster in clusters]
+        col_mode_playing_duration = [_statistic(_quasi_mode_playing_duration,
+                                                (cmt.playing_duration for stw in cluster for cmt in stw.comments))
+                                     for cluster in clusters]
 
         cols = {
             "cid": range(len(clusters)),
@@ -51,11 +51,11 @@ def landscape_metrics(all_clusters: Iterable[Set[FrozenSet[Stw]]]) -> Iterator[p
             "difficulty": col_difficulty,
             "entertainment": col_entertainment,
             "difent": [_statistic(mean, [dif, ent]) for dif, ent in zip(col_difficulty, col_entertainment)],
-            "mode_playing_time": col_mode_playing_time,
+            "mode_playing_duration": col_mode_playing_duration,
 
             # Used for sorting and filtering
-            "mode_playing_time_ordinal": [(PLAYING_TIME_ORDER_ASC.index(mpt) if mpt else None)
-                                          for mpt in col_mode_playing_time],
+            "mode_playing_duration_ordinal": [(PLAYING_DURATION_ORDER_ASC.index(mpt) if mpt else None)
+                                              for mpt in col_mode_playing_duration],
             "concat_names": ["+++".join(stw.name for stw in cluster) for cluster in clusters],
             "rids": [{region.rid for region in regions} for regions in col_regions]
         }
@@ -77,10 +77,10 @@ def _intra_or_nghbr_edges(intra_or_nghbr: str, cluster: FrozenSet[Stw]) -> Set[E
             if (nghbr.stw in cluster) == intra_or_nghbr}
 
 
-def _quasi_mode_playing_time(playing_times):
-    pt_ords = (PLAYING_TIME_ORDER_ASC.index(pt) for pt in playing_times)
+def _quasi_mode_playing_duration(playing_durations):
+    pt_ords = (PLAYING_DURATION_ORDER_ASC.index(pt) for pt in playing_durations)
     counts = [(ordi, sum(1 for _ in grp)) for ordi, grp in groupby(sorted(pt_ords))]
-    return PLAYING_TIME_ORDER_ASC[max(counts[::-1], key=itemgetter(1))[0]]
+    return PLAYING_DURATION_ORDER_ASC[max(counts[::-1], key=itemgetter(1))[0]]
 
 
 def player_metrics(dfs: List[pd.DataFrame]):
@@ -100,4 +100,4 @@ def player_metrics(dfs: List[pd.DataFrame]):
 
 
 def _n_occupied(stws: Collection[Stw], inst: int) -> int:
-    return sum(stw.occupants_at(inst) is not None for stw in stws)
+    return sum(stw.occupant_at(inst) is not None for stw in stws)

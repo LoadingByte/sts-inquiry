@@ -65,7 +65,7 @@ class Stw:
     entertainment: Optional[float]  # 1 through 4
     comments: List[Comment]
 
-    def occupants_at(self, instance: int):
+    def occupant_at(self, instance: int):
         return self.occupants[instance - 1]
 
     def __eq__(self, other):
@@ -97,4 +97,4 @@ class Player:
 @dataclass(frozen=True)
 class Comment:
     text: str
-    playing_time: Optional[str]
+    playing_duration: Optional[str]
