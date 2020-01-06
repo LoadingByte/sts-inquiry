@@ -56,10 +56,10 @@
 
 {%- macro stw_tooltip(stw) %}
   <div class="stw-tooltip-wrapper">
-    <div class="stw-tooltip">
-      <div class="stw-tooltip-col-1">
+    <div class="stw-tooltip flex-hor hor-gap-1">
+      <div class="flex-vert vert-gap-0-5">
         {% set screenshot_url = urljoin(sts_url, "shot/see_{}.jpeg".format(stw.aid)) %}
-        <a href="{{ screenshot_url }}" target="_blank" title="Größeres Bild anzeigen">
+        <a href="{{ screenshot_url }}" target="_blank" title="Größeres Bild anzeigen" class="stw-tooltip-screenshot">
           <noscript>
             <img src="{{ screenshot_url }}" alt="Screenshot des Stellwerks"/>
           </noscript>
@@ -67,6 +67,7 @@
         {% if stw.latitude is not none and stw.longitude is not none %}
           <div class="stw-tooltip-map-placeholder" style="display: none;">
             {# As soon as the user activates the tooltip, an iframe with this source URL will be created. #}
+            {# It will have the class "stw-tooltip-map". #}
             {% set zoom = 0.01 %}
             https://www.openstreetmap.org/export/embed.html?bbox={{ stw.longitude - zoom }}%2C{{ stw.latitude - zoom }}%2C{{ stw.longitude + zoom }}%2C{{ stw.latitude + zoom }}
           </div>
@@ -80,12 +81,16 @@
           </div>
         {% endif %}
       </div>
-      <div class="stw-tooltip-col-2">
-        <div class="stw-tooltip-nums">
-          <div>Schwierigkeitsgrad:</div>
-          <div>Unterhaltungsfaktor:</div>
-          <div>{{ stw.difficulty or "&ndash;"|safe }}</div>
-          <div>{{ stw.entertainment or "&ndash;"|safe }}</div>
+      <div class="flex-vert vert-gap-2">
+        <div class="flex-hor hor-gap-1">
+          <div class="flex-vert vert-gap-0-5">
+            <div>Schwierigkeitsgrad:</div>
+            <div>Unterhaltungsfaktor:</div>
+          </div>
+          <div class="flex-vert vert-gap-0-5">
+            <div>{{ stw.difficulty or "&ndash;"|safe }}</div>
+            <div>{{ stw.entertainment or "&ndash;"|safe }}</div>
+          </div>
         </div>
         <div class="stw-tooltip-comment-wrapper">
           {% for comment in stw.comments %}
@@ -109,6 +114,7 @@
 <head>
   <meta charset="utf-8"/>
   <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="fonts.css") }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="generic.css") }}"/>
   <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="style.css") }}"/>
   <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="stw.css") }}"/>
   <link rel="icon" type="image/png" href="{{ url_for("static", filename="favicon.png") }}"/>
@@ -126,43 +132,53 @@
 </header>
 
 <main>
-  <div class="form-wrapper">
-    <form method="get">
-      <div class="form-clsz" style="grid-area: clsz">
-        {{ form.clustersize.label }}
-        {{ form.clustersize }}
-      </div>
-      <div class="form-name" style="grid-area: name">
-        {{ form.name.label }}
-        {{ form.name }}
-      </div>
-      <div class="form-inst" style="grid-area: inst">
-        {{ form.instance.label }}
-        {{ form.instance }}
-      </div>
-      <div class="form-free" style="grid-area: free">
-        {{ form.free() }}
-        {{ form.free.label() }}
-      </div>
+  <div id="form-wrapper">
+    <form method="get" class="flex-vert vert-gap-1-5">
+      <div class="flex-hor hor-gap-2">
+        <div class="flex-vert vert-gap-1-2">
+          <div class="flex-hor hor-gap-1">
+            {{ form.clustersize.label }}
+            {{ form.clustersize }}
+          </div>
+          <div class="flex-vert vert-gap-0-2">
+            {{ form.name.label }}
+            {{ form.name }}
+          </div>
+          <div class="flex-hor hor-gap-1">
+            {{ form.instance.label }}
+            {{ form.instance }}
+          </div>
+          <div class="flex-hor hor-gap-0-5">
+            {{ form.free() }}
+            {{ form.free.label() }}
+          </div>
+        </div>
 
-      <div class="form-regions" style="grid-area: regions">
-        {{ form.regions.label }}
-        {{ form.regions }}
-      </div>
+        <div class="flex-vert vert-gap-0-5">
+          {{ form.regions.label }}
+          {{ form.regions }}
+        </div>
 
-      <div class="form-sort" style="grid-area: sort">
-        <span>Sortierung</span>
-        <div>
-          {{ form.sortby1.label(style="grid-area: label-1") }}
-          {{ form.sortby2.label(style="grid-area: label-2") }}
-          {{ form.sortby3.label(style="grid-area: label-3") }}
-          {{ form.sortby1(style="grid-area: field-1") }}
-          {{ form.sortby2(style="grid-area: field-2") }}
-          {{ form.sortby3(style="grid-area: field-3") }}
+        <div class="flex-vert vert-gap-0-5">
+          <div>Sortierung</div>
+          <div class="flex-vert vert-gap-0-5">
+            <div class="flex-hor hor-gap-1">
+              {{ form.sortby1.label }}
+              {{ form.sortby1 }}
+            </div>
+            <div class="flex-hor hor-gap-1">
+              {{ form.sortby2.label }}
+              {{ form.sortby2 }}
+            </div>
+            <div class="flex-hor hor-gap-1">
+              {{ form.sortby3.label }}
+              {{ form.sortby3 }}
+            </div>
+          </div>
         </div>
       </div>
 
-      {{ form.submit(style="grid-area: submit") }}
+      {{ form.submit }}
     </form>
   </div>
 
@@ -223,12 +239,14 @@
         <td>
           {% set cluster = row.cluster %}
           {% if cluster_size == 1 %}
-            <div class="stw">
-              {{ stw_core_box(cluster|first) }}
-              {{ stw_tooltip(cluster|first) }}
+            <div class="stw-container-single-stw">
+              <div class="stw">
+                {{ stw_core_box(cluster|first) }}
+                {{ stw_tooltip(cluster|first) }}
+              </div>
             </div>
           {% else %}
-            <div class="stw-container" style="{{ stw_container_dims }}">
+            <div class="stw-container-multi-stw" style="{{ stw_container_dims }}">
               <svg class="stw-background" viewBox="-5 -3 110 39" preserveAspectRatio="none">
                 {% set coord_lookup = dict(zip(cluster, stw_coords)) %}
                 {% for edge in row.intra_edges %}

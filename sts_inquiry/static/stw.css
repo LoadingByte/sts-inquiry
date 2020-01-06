@@ -1,4 +1,10 @@
-.stw-container {
+.stw-container-single-stw {
+    /* Center single stw */
+    display: flex;
+    justify-content: center;
+}
+
+.stw-container-multi-stw {
     position: relative;
     /* Width and height of this container will be set using inline styles depending on the cluster size. */
 }
@@ -19,16 +25,12 @@
     position: relative; /* for the tooltip z-index */
     min-width: 3.5em; /* so that there is definitely enough space for the small duration text in the player markers */
 
-    /* For the case when cluster size = 1 */
-    margin: auto;
-    width: min-content;
-
     background-color: #ffe;
     border: 2px solid #7f7f7f;
     box-shadow: 0 0 2px #aaa;
 }
 
-.stw:hover {
+.stw:hover, .stw.ie-hover {
     background-color: #ffd;
     box-shadow: inset 0 0 3px #777;
     z-index: 1; /* for the tooltip */
@@ -81,38 +83,31 @@
     border: 2px solid #7f7f7f;
 }
 
-.stw:hover > .stw-tooltip-wrapper {
+.stw:hover > .stw-tooltip-wrapper, .stw.ie-hover > .stw-tooltip-wrapper {
     visibility: visible;
 }
 
 .stw-tooltip {
     margin: 0.7em;
     font-size: 0.8em;
-
-    /* Three column layout */
-    display: grid;
-    grid-template-columns: 20em 20em 20em;
-    grid-template-rows: minmax(0, 30em);
-    grid-gap: 1em;
 }
 
-/* These columns have multiple elements that stack vertically. */
-.stw-tooltip-col-1, .stw-tooltip-col-2 {
-    display: flex;
-    flex-direction: column;
+.stw-tooltip > div {
+    width: 20em;
+    max-height: 30em;
 }
 
 /* Tooltip column 1 */
 
-.stw-tooltip-col-1 > *:not(:first-child) {
-    margin-top: 0.5em;
+.stw-tooltip-screenshot {
+    flex-shrink: 0; /* IE is stupid */
 }
 
-.stw-tooltip-col-1 img {
+.stw-tooltip-screenshot img {
     width: 100%;
 }
 
-.stw-tooltip-col-1 iframe {
+.stw-tooltip-map {
     width: 100%;
     height: 100%;
     border: None;
@@ -124,13 +119,8 @@
 
 /* Tooltip column 2 */
 
-.stw-tooltip-nums {
-    display: grid;
-    grid-template: auto auto / min-content auto;
-    grid-auto-flow: column;
-    grid-gap: 0.5em 1em;
-
-    margin-bottom: 2em;
+.stw-tooltip-comment-wrapper {
+    height: 100%; /* disables scrollbar if there is enough vertical space */
 }
 
 .stw-tooltip-comment:not(:first-child) {
@@ -166,7 +156,6 @@
 /* Scrollable wrappers in tooltip columns 2 and 3 */
 
 .stw-tooltip-comment-wrapper, .stw-tooltip-description {
-    height: 100%;
     overflow-y: auto; /* y scrolling */
     padding-right: 0.5em; /* padding between this and the scrollbar */
 }

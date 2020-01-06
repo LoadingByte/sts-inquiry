@@ -26,68 +26,35 @@ header h1 {
 
 /* Form */
 
-.form-wrapper {
+#form-wrapper {
     display: table; /* as small as possible */
     margin: auto; /* center */
 }
 
 form {
-    display: grid;
-    grid-gap: 1.2em 2em;
-    /* @formatter:off */
-    grid-template-areas:
-        "clsz   regions sort"
-        "name   regions sort"
-        "inst   regions sort"
-        "free   regions sort"
-        "submit submit  submit";
-    /* @formatter:on */
+    white-space: nowrap;
 
-    /* Separator between this and the results */
+    /* Separator between this form and the results */
     padding-bottom: 2em;
     border-bottom: 2px dotted #aaa;
     margin-bottom: 1.5em;
 }
 
-.form-clsz, .form-inst, .form-free {
-    display: grid;
-    grid-template-columns: min-content auto;
-    grid-gap: 0.8em;
-    white-space: nowrap;
+input {
+    /* We use this instead of width: 100%; to prevent inputs that are wider than the surrounding box. */
+    box-sizing: border-box;
 }
 
-.form-free {
-    grid-gap: 0.5em;
+select {
+    width: 100%;
 }
 
-.form-name, .form-regions, .form-sort {
-    display: grid;
-    grid-template-rows: min-content auto;
-    grid-gap: 0.5em;
-}
-
-.form-name {
-    grid-gap: 0.2em;
-}
-
-.form-regions > select {
+select#regions {
     height: 100%;
 }
 
-.form-sort > div {
-    display: grid;
-    align-content: start;
-    align-items: start;
-    grid-gap: 0.5em 0.8em;
-    /* @formatter:off */
-    grid-template-areas:
-        "label-1 field-1"
-        "label-2 field-2"
-        "label-3 field-3";
-    /* @formatter:on */
-}
+/* Pagination and result count notice */
 
-/* Result count notice */
 main > p {
     text-align: center;
 }

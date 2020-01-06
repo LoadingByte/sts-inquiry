@@ -1,0 +1,40 @@
+.flex-hor {
+    display: flex;
+}
+
+.flex-vert {
+    display: flex;
+    flex-direction: column;
+}
+
+.hor-gap-0-5 > *:not(:first-child) {
+    margin-left: 0.5em;
+}
+
+.hor-gap-1 > *:not(:first-child) {
+    margin-left: 1em;
+}
+
+.hor-gap-2 > *:not(:first-child) {
+    margin-left: 2em;
+}
+
+.vert-gap-0-2 > *:not(:first-child) {
+    margin-top: 0.2em;
+}
+
+.vert-gap-0-5 > *:not(:first-child) {
+    margin-top: 0.5em;
+}
+
+.vert-gap-1-2 > *:not(:first-child) {
+    margin-top: 1.2em;
+}
+
+.vert-gap-1-5 > *:not(:first-child) {
+    margin-top: 1.5em;
+}
+
+.vert-gap-2 > *:not(:first-child) {
+    margin-top: 2em;
+}
