@@ -211,6 +211,15 @@
     </tr>
     </thead>
     <tbody>
+    {% if cluster_size <= 3 %}
+      {% set stw_container_dims = "width: 21em; height: 7em" %}
+    {% elif cluster_size == 4 %}
+      {% set stw_container_dims = "width: 24em; height: 8em" %}
+    {% elif cluster_size == 5 %}
+      {% set stw_container_dims = "width: 27em; height: 9em" %}
+    {% else %}
+      {% set stw_container_dims = "width: 30em; height: 10em" %}
+    {% endif %}
     {% for row in rows %}
       <tr>
         <td>{{ row.Index + 1 }}</td>
@@ -219,7 +228,7 @@
           {% if cluster_size == 1 %}
             {{ stw_with_tooltip(cluster|first, "width: min-content; margin: auto") }}
           {% else %}
-            <div class="stw-container">
+            <div class="stw-container" style="{{ stw_container_dims }}">
               <svg class="stw-background" viewBox="-5 -3 110 39" preserveAspectRatio="none">
                 {% set coord_lookup = dict(zip(cluster, stw_coords)) %}
                 {% for edge in row.intra_edges %}

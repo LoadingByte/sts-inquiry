@@ -1,7 +1,6 @@
 .stw-container {
     position: relative;
-    width: 24em;
-    height: 8em;
+    /* Width and height of this container will be set using inline styles depending on the cluster size. */
 }
 
 .stw-background {
