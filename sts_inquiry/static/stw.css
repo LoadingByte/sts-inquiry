@@ -18,6 +18,7 @@
 .stw {
     visibility: visible; /* reset the stw-parent's visibility. */
     position: relative; /* for the tooltip z-index */
+    min-width: 3em; /* so that there is definitely enough space for the small duration text in the player markers */
 
     background-color: #ffe;
     border: 2px solid #7f7f7f;
@@ -35,6 +36,7 @@
     display: block;
     padding: 0.2em 0.3em 0.1em 0.3em;
 
+    text-align: center; /* in case the surrounding box is wider than the text, bc. of min-width in .stw */
     white-space: nowrap;
     text-decoration: inherit; /* disable link underline */
 
@@ -49,10 +51,21 @@
     justify-content: space-between;
 }
 
-.stw-player-marker {
-    width: 47%;
-    height: 2px;
-    background-color: #e0c;
+.stw-player-marker-free, .stw-player-marker-occupied {
+    width: 45%;
+    height: 10px;
+    border: 1px solid #ddd;
+}
+
+.stw-player-marker-occupied {
+    /* Disallow Open Sans because that font has a strange padding at the top. */
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    background-color: #cd00af;
+    border-color: #cd00af;
 }
 
 .stw-tooltip-wrapper {
@@ -103,7 +116,7 @@
     border: None;
 }
 
-.stw-tooltip-map-link {
+.stw-tooltip-map-links {
     text-align: center;
 }
 
@@ -122,14 +135,14 @@
     margin-top: 0.8em;
 }
 
-/* Playing time */
+/* Playing duration and year */
 .stw-tooltip-comment > div {
     float: right;
     white-space: nowrap;
     color: #888;
 }
 
-/* Clear playing time float */
+/* Clear playing duration and year float */
 .stw-tooltip-comment::after {
     display: block;
     clear: both;

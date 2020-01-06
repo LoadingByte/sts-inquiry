@@ -37,9 +37,20 @@
   <a href="{{ urljoin(sts_url, "anlagen.php?beta=on#stellwerk={}".format(stw.aid)) }}"
      target="_blank">{{ stw.name }}</a>
   <div class="stw-player-marker-wrapper">
-    <div class="stw-player-marker" style="{{ "visibility: hidden" if not stw.occupants[0] }}"></div>
-    <div class="stw-player-marker" style="{{ "visibility: hidden" if not stw.occupants[1] }}"></div>
+    {{ stw_player_marker(stw, 1) }}
+    {{ stw_player_marker(stw, 2) }}
   </div>
+{% endmacro -%}
+
+{%-macro stw_player_marker(stw, inst) %}
+  {% set player = stw.occupant_at(inst) %}
+  {% if player %}
+    <div title="{{ player.name }} steuert Instanz {{ inst }} seit ungefähr {{ player.format_playing_duration() }}"
+         class="stw-player-marker-occupied">{{ player.format_playing_duration(short=True) }}
+    </div>
+  {% else %}
+    <div class="stw-player-marker-free"></div>
+  {% endif %}
 {% endmacro -%}
 
 
@@ -62,10 +73,14 @@
               {% set zoom = 0.01 %}
               https://www.openstreetmap.org/export/embed.html?bbox={{ stw.longitude - zoom }}%2C{{ stw.latitude - zoom }}%2C{{ stw.longitude + zoom }}%2C{{ stw.latitude + zoom }}
             </div>
-            <a class="stw-tooltip-map-link" target="_blank"
-               href="https://www.openrailwaymap.org/?lat={{ stw.latitude }}&lon={{ stw.longitude }}&zoom=15&style=standard">
-              Größere Karte anzeigen
-            </a>
+            <div class="stw-tooltip-map-links">
+              Groß:
+              <a href="https://www.openstreetmap.org/?lat={{ stw.latitude }}&lon={{ stw.longitude }}&zoom=15"
+                 target="_blank">Straßenkarte</a>
+              &ndash;
+              <a href="https://www.openrailwaymap.org/?lat={{ stw.latitude }}&lon={{ stw.longitude }}&zoom=15&style=standard"
+                 target="_blank">Gleiskarte</a>
+            </div>
           {% endif %}
         </div>
         <div class="stw-tooltip-col-2">
@@ -246,7 +261,7 @@
         <td>{{ "{:.2f}".format(row.difficulty) if not isnan(row.difficulty) else "&ndash;"|safe }}</td>
         <td>{{ "{:.2f}".format(row.entertainment) if not isnan(row.entertainment) else "&ndash;"|safe }}</td>
         <td>{{ "{:.2f}".format(row.difent) if not isnan(row.difent) else "&ndash;"|safe }}</td>
-        <td>{{ row.mode_playing_time if row.mode_playing_time else "&ndash;"|safe }}</td>
+        <td>{{ row.mode_playing_duration if row.mode_playing_duration else "&ndash;"|safe }}</td>
         <td>{{ row.instance }}</td>
         <td>{{ row.nghbr_occupants }}</td>
         <td>{{ row.region_occupants }}</td>

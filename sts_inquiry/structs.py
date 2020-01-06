@@ -93,8 +93,19 @@ class Player:
     stitz: bool
     start_time: datetime
 
+    def format_playing_duration(self, short=False) -> str:
+        secs = round((datetime.now() - self.start_time).total_seconds())
+        if secs < 60:
+            return f"{secs}{'s' if short else (' Sekunde' if secs == 1 else ' Sekunden')}"
+        mins = round(secs / 60)
+        if mins < 60:
+            return f"{mins}{'m' if short else (' Minute' if mins == 1 else ' Minuten')}"
+        hours = round(mins / 60)
+        return f"{hours}{'h' if short else (' Stunde' if hours == 1 else ' Stunden')}"
+
 
 @dataclass(frozen=True)
 class Comment:
     text: str
     playing_duration: Optional[str]
+    year: int
