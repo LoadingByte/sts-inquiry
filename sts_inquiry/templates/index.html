@@ -82,26 +82,53 @@
         {% endif %}
       </div>
       <div class="flex-vert vert-gap-2">
-        <div class="flex-hor hor-gap-1">
-          <div class="flex-vert vert-gap-0-5">
-            <div>Schwierigkeitsgrad:</div>
-            <div>Unterhaltungsfaktor:</div>
-          </div>
-          <div class="flex-vert vert-gap-0-5">
-            <div>{{ stw.difficulty or "&ndash;"|safe }}</div>
-            <div>{{ stw.entertainment or "&ndash;"|safe }}</div>
+        <div class="stw-tooltip-summary">
+          <h2>Bewertung</h2>
+          <div class="flex-hor hor-gap-1">
+            <div class="flex-hor hor-gap-0-5 stw-tooltip-scores">
+              <div>
+                <div>Schwierigkeitsgrad</div>
+                {% if stw.difficulty %}
+                  <div class="stw-bar">
+                    <div class="stw-bar-value">{{ stw.difficulty }}</div>
+                    <div class="stw-bar-indicator" style="left:{{ (stw.difficulty - 1.0) / 3.0 * 100.0 }}%"></div>
+                  </div>
+                {% else %}
+                  <div>
+                    {{ "&ndash;"|safe }}
+                  </div>
+                {% endif %}
+              </div>
+              <div>
+                <div>Unterhaltungsfaktor</div>
+                {% if stw.entertainment %}
+                  <div class="stw-bar">
+                    <div class="stw-bar-value">{{ stw.entertainment }}</div>
+                    <div class="stw-bar-indicator" style="left:{{ (stw.entertainment - 1.0) / 3.0 * 100.0 }}%"></div>
+                  </div>
+                {% else %}
+                  <div>
+                    {{ "&ndash;"|safe }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
           </div>
         </div>
-        <div class="stw-tooltip-comment-wrapper">
-          {% for comment in stw.comments %}
-            <div class="stw-tooltip-comment">
-              {{ comment.text }}
-              <div>&nbsp;({{ comment.playing_duration ~ ", " if comment.playing_duration }}{{ comment.year }})</div>
-            </div>
-          {% endfor %}
+        <div class="stw-tooltip-comments">
+          <h2>Spielermeinungen</h2>
+          <div class="stw-tooltip-comment-wrapper">
+            {% for comment in stw.comments %}
+              <div class="stw-tooltip-comment">
+                {{ comment.text }}
+                <div>&nbsp;({{ comment.playing_duration ~ ", " if comment.playing_duration }}{{ comment.year }})</div>
+              </div>
+            {% endfor %}
+          </div>
         </div>
       </div>
       <div class="stw-tooltip-description">
+        <h2>Beschreibung</h2>
         {{ stw.description }}
       </div>
     </div>
@@ -133,6 +160,7 @@
 
 <main>
   <div id="form-wrapper">
+    <h2>Suchoptionen</h2>
     <form method="get" class="flex-vert vert-gap-1-5">
       <div class="flex-hor hor-gap-2">
         <div class="flex-vert vert-gap-1-2">

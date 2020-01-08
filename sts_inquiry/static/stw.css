@@ -93,8 +93,10 @@
 }
 
 .stw-tooltip > div {
-    width: 20em;
+    width: 25em;
     max-height: 30em;
+    border: thin solid grey;
+    padding: 0.5em;
 }
 
 /* Tooltip column 1 */
@@ -125,6 +127,50 @@
 
 .stw-tooltip-comment:not(:first-child) {
     margin-top: 0.8em;
+}
+
+/* Disable top margins in headings */
+h2:first-child, h3:first-child {
+    margin-top: 0;
+}
+
+/* Score bar */
+.stw-bar {
+    width: 120px;
+    height: 25px;
+    border: 1px solid grey;
+    background: linear-gradient( to right, #ff4e50, #9cf923 ); /* #f9d423 */
+    position: relative;
+    margin: 5px;
+}
+
+/* Vertical indicator inside score bar */
+.stw-bar-indicator {
+    height: 29px;
+    position: absolute;
+    width: 4px;
+    background: rgba(70, 70, 70, 0.6);
+    top: -2px;
+}
+
+/* Value inside score bar */
+.stw-bar-value {
+    text-align: center;
+    font-weight: bold;
+    font-size: larger;
+}
+
+.stw-tooltip-scores {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-grow: 1;
+}
+
+.stw-tooltip-scores > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* Playing duration and year */
