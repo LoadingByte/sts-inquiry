@@ -14,7 +14,7 @@ class SearchForm(FlaskForm):
 
     name = StringField("Stellwerkname")
     regions = SelectMultipleField("Regionen", coerce=int)
-    instance = SelectField("Instanz für #\U0001F464", coerce=int, default=-1,
+    instance = SelectField("Instanz", coerce=int, default=-1,
                            choices=[(-1, "-- Alle -- ")] + [(inst, str(inst)) for inst in INSTANCES])
     free = BooleanField("Stellwerke unbesetzt")
 
