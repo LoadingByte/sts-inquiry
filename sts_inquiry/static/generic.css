@@ -7,16 +7,14 @@
     flex-direction: column;
 }
 
+/* Blank gaps */
+
 .hor-gap-0-5 > *:not(:first-child) {
     margin-left: 0.5em;
 }
 
 .hor-gap-1 > *:not(:first-child) {
     margin-left: 1em;
-}
-
-.hor-gap-2 > *:not(:first-child) {
-    margin-left: 2em;
 }
 
 .vert-gap-0-2 > *:not(:first-child) {
@@ -31,10 +29,20 @@
     margin-top: 1.2em;
 }
 
-.vert-gap-1-5 > *:not(:first-child) {
-    margin-top: 1.5em;
-}
-
 .vert-gap-2 > *:not(:first-child) {
     margin-top: 2em;
+}
+
+/* Gaps with separator */
+
+.hor-gap-4-sep > *:not(:first-child) {
+    margin-left: 2em;
+    padding-left: 2em;
+    border-left: 1px solid #ccc;
+}
+
+.hor-gap-3-sep > *:not(:first-child) {
+    margin-left: 1.5em;
+    padding-left: 1.5em;
+    border-left: 1px solid #ccc;
 }

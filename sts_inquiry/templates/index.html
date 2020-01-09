@@ -55,83 +55,65 @@
 
 
 {%- macro stw_tooltip(stw) %}
-  <div class="stw-tooltip-wrapper">
-    <div class="stw-tooltip flex-hor hor-gap-1">
-      <div class="flex-vert vert-gap-0-5">
-        {% set screenshot_url = urljoin(sts_url, "shot/see_{}.jpeg".format(stw.aid)) %}
-        <a href="{{ screenshot_url }}" target="_blank" title="Größeres Bild anzeigen" class="stw-tooltip-screenshot">
-          <noscript>
-            <img src="{{ screenshot_url }}" alt="Screenshot des Stellwerks"/>
-          </noscript>
-        </a>
-        {% if stw.latitude is not none and stw.longitude is not none %}
-          <div class="stw-tooltip-map-placeholder" style="display: none;">
-            {# As soon as the user activates the tooltip, an iframe with this source URL will be created. #}
-            {# It will have the class "stw-tooltip-map". #}
-            {% set zoom = 0.01 %}
-            https://www.openstreetmap.org/export/embed.html?bbox={{ stw.longitude - zoom }}%2C{{ stw.latitude - zoom }}%2C{{ stw.longitude + zoom }}%2C{{ stw.latitude + zoom }}
-          </div>
-          <div class="stw-tooltip-map-links">
-            Groß:
-            <a href="https://www.openstreetmap.org/?lat={{ stw.latitude }}&lon={{ stw.longitude }}&zoom=15"
-               target="_blank">Straßenkarte</a>
-            &ndash;
-            <a href="https://www.openrailwaymap.org/?lat={{ stw.latitude }}&lon={{ stw.longitude }}&zoom=15&style=standard"
-               target="_blank">Gleiskarte</a>
-          </div>
-        {% endif %}
-      </div>
-      <div class="flex-vert vert-gap-2">
-        <div class="stw-tooltip-summary">
-          <h2>Bewertung</h2>
-          <div class="flex-hor hor-gap-1">
-            <div class="flex-hor hor-gap-0-5 stw-tooltip-scores">
-              <div>
-                <div>Schwierigkeitsgrad</div>
-                {% if stw.difficulty %}
-                  <div class="stw-bar">
-                    <div class="stw-bar-value">{{ stw.difficulty }}</div>
-                    <div class="stw-bar-indicator" style="left:{{ (stw.difficulty - 1.0) / 3.0 * 100.0 }}%"></div>
-                  </div>
-                {% else %}
-                  <div>
-                    {{ "&ndash;"|safe }}
-                  </div>
-                {% endif %}
-              </div>
-              <div>
-                <div>Unterhaltungsfaktor</div>
-                {% if stw.entertainment %}
-                  <div class="stw-bar">
-                    <div class="stw-bar-value">{{ stw.entertainment }}</div>
-                    <div class="stw-bar-indicator" style="left:{{ (stw.entertainment - 1.0) / 3.0 * 100.0 }}%"></div>
-                  </div>
-                {% else %}
-                  <div>
-                    {{ "&ndash;"|safe }}
-                  </div>
-                {% endif %}
-              </div>
-            </div>
-          </div>
+  <div class="stw-tooltip flex-hor hor-gap-3-sep">
+    <div class="flex-vert vert-gap-0-5">
+      {% set screenshot_url = urljoin(sts_url, "shot/see_{}.jpeg".format(stw.aid)) %}
+      <a href="{{ screenshot_url }}" target="_blank" title="Größeres Bild anzeigen" class="stw-tooltip-screenshot">
+        <noscript>
+          <img src="{{ screenshot_url }}" alt="Screenshot des Stellwerks"/>
+        </noscript>
+      </a>
+      {% if stw.latitude is not none and stw.longitude is not none %}
+        <div class="stw-tooltip-map-placeholder" style="display: none;">
+          {# As soon as the user activates the tooltip, an iframe with this source URL will be created. #}
+          {# It will have the class "stw-tooltip-map". #}
+          {% set zoom = 0.01 %}
+          https://www.openstreetmap.org/export/embed.html?bbox={{ stw.longitude - zoom }}%2C{{ stw.latitude - zoom }}%2C{{ stw.longitude + zoom }}%2C{{ stw.latitude + zoom }}
         </div>
-        <div class="stw-tooltip-comments">
-          <h2>Spielermeinungen</h2>
-          <div class="stw-tooltip-comment-wrapper">
-            {% for comment in stw.comments %}
-              <div class="stw-tooltip-comment">
-                {{ comment.text }}
-                <div>&nbsp;({{ comment.playing_duration ~ ", " if comment.playing_duration }}{{ comment.year }})</div>
-              </div>
-            {% endfor %}
-          </div>
+        <div class="stw-tooltip-map-links">
+          Groß:
+          <a href="https://www.openstreetmap.org/?lat={{ stw.latitude }}&lon={{ stw.longitude }}&zoom=15"
+             target="_blank">Straßenkarte</a>
+          &ndash;
+          <a href="https://www.openrailwaymap.org/?lat={{ stw.latitude }}&lon={{ stw.longitude }}&zoom=15&style=standard"
+             target="_blank">Gleiskarte</a>
         </div>
+      {% endif %}
+    </div>
+    <div class="flex-vert vert-gap-2">
+      <div class="stw-tooltip-score-wrapper">
+        {{ stw_score_bar(stw.difficulty, "Schwierigkeitsgrad") }}
+        {{ stw_score_bar(stw.entertainment, "Unterhaltungsfaktor") }}
       </div>
-      <div class="stw-tooltip-description">
-        <h2>Beschreibung</h2>
-        {{ stw.description }}
+      <div class="stw-tooltip-comment-wrapper">
+        {% for comment in stw.comments %}
+          <div class="stw-tooltip-comment">
+            {{ comment.text }}
+            <div>&nbsp;({{ comment.playing_duration ~ ", " if comment.playing_duration }}{{ comment.year }})</div>
+          </div>
+        {% endfor %}
       </div>
     </div>
+    <div class="stw-tooltip-description">
+      {{ stw.description }}
+    </div>
+  </div>
+{% endmacro -%}
+
+{%- macro stw_score_bar(score, label) %}
+  <div class="stw-tooltip-score-element">
+    <div>{{ label }}</div>
+    {% if score %}
+      <div class="stw-tooltip-score-bar">
+        {# Note: The -5 stems from the 5% indicator width defined in CSS. #}
+        <div class="stw-tooltip-score-bar-indicator" style="left: {{ (score - 1) / 3 * (100 - 5) }}%"></div>
+        <div class="stw-tooltip-score-bar-value">{{ "{:.2f}".format(score).replace(".", ",") }}</div>
+      </div>
+    {% else %}
+      <div class="stw-tooltip-score-bar-replacement">
+        &ndash;
+      </div>
+    {% endif %}
   </div>
 {% endmacro -%}
 
@@ -160,9 +142,8 @@
 
 <main>
   <div id="form-wrapper">
-    <h2>Suchoptionen</h2>
-    <form method="get" class="flex-vert vert-gap-1-5">
-      <div class="flex-hor hor-gap-2">
+    <form method="get" class="flex-vert vert-gap-2">
+      <div class="flex-hor hor-gap-4-sep">
         <div class="flex-vert vert-gap-1-2">
           <div class="flex-hor hor-gap-1">
             {{ form.clustersize.label }}

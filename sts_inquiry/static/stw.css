@@ -72,31 +72,26 @@
     border-color: #cd00af;
 }
 
-.stw-tooltip-wrapper {
+.stw-tooltip {
     /* Can't use display: none instead of visibility because Firefox destroys iframes when they become display: none. */
     visibility: hidden;
 
     position: absolute;
     left: -2px;
 
+    padding: 1em;
     background-color: #ffe;
     border: 2px solid #7f7f7f;
-}
-
-.stw:hover > .stw-tooltip-wrapper, .stw.ie-hover > .stw-tooltip-wrapper {
-    visibility: visible;
-}
-
-.stw-tooltip {
-    margin: 0.7em;
     font-size: 0.8em;
 }
 
+.stw:hover > .stw-tooltip, .stw.ie-hover > .stw-tooltip {
+    visibility: visible;
+}
+
 .stw-tooltip > div {
-    width: 25em;
+    width: 22em;
     max-height: 30em;
-    border: thin solid grey;
-    padding: 0.5em;
 }
 
 /* Tooltip column 1 */
@@ -121,56 +116,57 @@
 
 /* Tooltip column 2 */
 
+.stw-tooltip-score-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.stw-tooltip-score-element {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stw-tooltip-score-bar-replacement {
+    margin-top: 0.7em;
+}
+
+/* Score bar */
+.stw-tooltip-score-bar {
+    position: relative;
+    width: 9em;
+    height: 2em;
+    margin-top: 0.4em;
+
+    border: 1px solid grey;
+    background: linear-gradient(to right, #e6532e, #a6a621, #53e62e);
+}
+
+/* Vertical indicator inside score bar */
+.stw-tooltip-score-bar-indicator {
+    position: absolute;
+    top: -12%;
+    width: 5%;
+    height: 124%;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.stw-tooltip-score-bar-value {
+    position: relative; /* put value in the same stacking context as indicator */
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.3em;
+    color: rgba(255, 255, 255, 0.8);
+
+}
+
 .stw-tooltip-comment-wrapper {
     height: 100%; /* disables scrollbar if there is enough vertical space */
 }
 
 .stw-tooltip-comment:not(:first-child) {
     margin-top: 0.8em;
-}
-
-/* Disable top margins in headings */
-h2:first-child, h3:first-child {
-    margin-top: 0;
-}
-
-/* Score bar */
-.stw-bar {
-    width: 120px;
-    height: 25px;
-    border: 1px solid grey;
-    background: linear-gradient( to right, #ff4e50, #9cf923 ); /* #f9d423 */
-    position: relative;
-    margin: 5px;
-}
-
-/* Vertical indicator inside score bar */
-.stw-bar-indicator {
-    height: 29px;
-    position: absolute;
-    width: 4px;
-    background: rgba(70, 70, 70, 0.6);
-    top: -2px;
-}
-
-/* Value inside score bar */
-.stw-bar-value {
-    text-align: center;
-    font-weight: bold;
-    font-size: larger;
-}
-
-.stw-tooltip-scores {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    flex-grow: 1;
-}
-
-.stw-tooltip-scores > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 /* Playing duration and year */
