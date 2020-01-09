@@ -81,7 +81,7 @@
 
     padding: 1em;
     background-color: #ffe;
-    border: 2px solid #7f7f7f;
+    border: inherit;
     font-size: 0.8em;
 }
 
@@ -90,7 +90,7 @@
 }
 
 .stw-tooltip > div {
-    width: 22em;
+    min-width: 22em; /* min-width instead of just width because IE is stupid */
     max-height: 30em;
 }
 
