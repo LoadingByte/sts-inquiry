@@ -1,3 +1,5 @@
+/* Open Sans font source: https://fonts.google.com/specimen/Open+Sans */
+
 @font-face {
     font-family: "Open Sans";
     font-style: normal;
@@ -50,15 +52,14 @@
     /* @formatter:on */
 }
 
+/* D-DIN font source: https://www.datto.com/fonts/d-din/ */
 @font-face {
-    font-family: "Open Sans Condensed";
+    font-family: "D-DIN Condensed";
     font-style: normal;
-    font-weight: 300;
+    font-weight: 400;
     /* @formatter:off */
     src:
-        local("Open Sans Condensed Light"),
-        local("OpenSansCondensed-Light"),
-        url("fonts/Open_Sans_Condensed_300.woff") format("woff"),
-        url("fonts/Open_Sans_Condensed_300.woff2") format("woff2");
+        url("fonts/D-DINCondensed.woff") format("woff"),
+        url("fonts/D-DINCondensed.woff2") format("woff2");
     /* @formatter:on */
 }

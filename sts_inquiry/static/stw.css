@@ -39,15 +39,15 @@
 /* Stw name */
 .stw > a {
     display: block;
-    padding: 0.2em 0.3em 0.2em 0.3em;
+    padding: 0.4em 0.35em 0.3em 0.35em;
 
     text-align: center; /* in case the surrounding box is wider than the text, bc. of min-width in .stw */
     white-space: nowrap;
-    text-decoration: inherit; /* disable link underline */
+    text-decoration: none; /* disable link underline */
 
     font-size: 0.9em;
     /* Narrower font */
-    font-family: "Open Sans Condensed", "Helvetica Narrow", "Arial Narrow", "Open Sans",
+    font-family: "D-DIN Condensed", "Open Sans Condensed", "Helvetica Narrow", "Arial Narrow", "Open Sans",
     Helvetica, Arial, sans-serif;
 }
 
