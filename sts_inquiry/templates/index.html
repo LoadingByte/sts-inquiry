@@ -36,7 +36,7 @@
 {%- macro stw_core_box(stw) %}
   <a href="{{ urljoin(sts_url, "anlagen.php?beta=on#stellwerk={}".format(stw.aid)) }}"
      target="_blank">{{ stw.name }}</a>
-  <div class="stw-player-marker-wrapper">
+  <div class="stw-player-marker-container">
     {{ stw_player_marker(stw, 1) }}
     {{ stw_player_marker(stw, 2) }}
   </div>
@@ -81,11 +81,11 @@
       {% endif %}
     </div>
     <div class="flex-vert vert-gap-2">
-      <div class="stw-tooltip-score-wrapper">
+      <div class="stw-tooltip-score-container">
         {{ stw_score_bar(stw.difficulty, "Schwierigkeitsgrad") }}
         {{ stw_score_bar(stw.entertainment, "Unterhaltungsfaktor") }}
       </div>
-      <div class="stw-tooltip-comment-wrapper">
+      <div class="stw-tooltip-comment-container">
         {% for comment in stw.comments %}
           <div class="stw-tooltip-comment">
             {{ comment.text }}
@@ -208,7 +208,6 @@
       <th>Rang</th>
       <th>{{ "Cluster" if multi else "Stellwerk" }}</th>
       <th>Nachbarn</th>
-      <th>Region</th>
       <th><abbr title="Direkte Übergabepunkte im Cluster{{ " (immer 0, da Clustergröße 1)" if not multi }}">
         {{ metric_col_labels["intra_handovers"] }}</abbr></th>
       <th><abbr title="Direkte Übergabepunkte mit Nachbarstellwerken">
@@ -233,15 +232,36 @@
     </tr>
     </thead>
     <tbody>
-    {% if cluster_size <= 3 %}
-      {% set stw_container_dims = "width: 21em; height: 7em" %}
+
+    {%- if cluster_size <= 3 %}
+      {% set stw_cont_height = 7 %}
     {% elif cluster_size == 4 %}
-      {% set stw_container_dims = "width: 24em; height: 8em" %}
+      {% set stw_cont_height = 8 %}
     {% elif cluster_size == 5 %}
-      {% set stw_container_dims = "width: 27em; height: 9em" %}
+      {% set stw_cont_height = 9 %}
     {% else %}
-      {% set stw_container_dims = "width: 30em; height: 10em" %}
-    {% endif %}
+      {% set stw_cont_height = 10 %}
+    {% endif -%}
+
+    {%- set stw_cont_width = stw_cont_height * 3 -%}
+
+    {%- if cluster_size == 2 %}
+      {% set stw_cont_style = "margin-top: -1.5em; margin-bottom: -1.5em" %}
+    {% endif -%}
+
+
+    {%- if cluster_size == 1 %}
+      {% set region_cont_max_width = 10 %}
+    {% else %}
+      {% set region_cont_max_width = stw_cont_width %}
+    {% endif -%}
+
+    {%- if cluster_size <= 3 %}
+      {% set region_cont_margin = 0.8 %}
+    {% else %}
+      {% set region_cont_margin = 1.5 %}
+    {% endif -%}
+
     {% for row in rows %}
       <tr>
         <td>{{ row.Index + 1 }}</td>
@@ -255,7 +275,8 @@
               </div>
             </div>
           {% else %}
-            <div class="stw-container-multi-stw" style="{{ stw_container_dims }}">
+            <div class="stw-container-multi-stw"
+                 style="width: {{ stw_cont_width }}em; height: {{ stw_cont_height }}em; {{ stw_cont_style }}">
               <svg class="stw-background" viewBox="-5 -3 110 39" preserveAspectRatio="none">
                 {% set coord_lookup = dict(zip(cluster, stw_coords)) %}
                 {% for edge in row.intra_edges %}
@@ -275,24 +296,25 @@
               {% endfor %}
             </div>
           {% endif %}
+          <div class="region-container"
+               style="max-width: {{ region_cont_max_width }}em; margin-top: {{ region_cont_margin }}em">
+            (
+            {% for region in row.regions %}
+              <a href="{{ urljoin(sts_url, "anlagen.php?beta=on#region={}".format(region.rid)) }}" target="_blank">
+                {{ region.name }}</a>
+              {{- "," if not loop.last }}
+            {% endfor %}
+            )
+          </div>
         </td>
         <td>
-          <div class="neighbor-wrapper">
+          <div class="neighbor-container">
             {% for nghbr in row.neighbors %}
               <div class="stw">
                 {{ stw_core_box(nghbr) }}
               </div>
             {% endfor %}
           </div>
-        </td>
-        <td>
-          <ul>
-            {% for region in row.regions %}
-              <li><a href="{{ urljoin(sts_url, "anlagen.php?beta=on#region={}".format(region.rid)) }}" target="_blank">
-                {{ region.name }}
-              </a></li>
-            {% endfor %}
-          </ul>
         </td>
         <td>{{ row.intra_handovers }}</td>
         <td>{{ row.nghbr_handovers }}</td>

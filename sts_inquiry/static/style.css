@@ -104,8 +104,8 @@ td:nth-child(2) {
     padding-right: 1.5em;
 }
 
-/* Neighbors and region columns */
-td:nth-child(3), td:nth-child(4) {
+/* Neighbors columns */
+td:nth-child(3) {
     padding-left: 1em;
     padding-right: 1em;
 }
@@ -127,21 +127,24 @@ th:not(:first-child), td:not(:first-child) {
     border-left: 2px dashed #ddd;
 }
 
-.neighbor-wrapper {
+.region-container {
+    text-align: center;
+    color: #888;
+}
+
+.region-container a {
+    color: #666;
+}
+
+.neighbor-container {
     max-width: 25em;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
 }
 
-.neighbor-wrapper .stw {
+.neighbor-container .stw {
     margin: 0.3em 0.5em; /* spacing between stws */
-}
-
-ul {
-    margin: 0;
-    padding-left: 0;
-    list-style: none;
 }
 
 /* Footer */

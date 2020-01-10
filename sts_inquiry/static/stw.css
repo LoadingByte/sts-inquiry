@@ -51,7 +51,7 @@
     Helvetica, Arial, sans-serif;
 }
 
-.stw-player-marker-wrapper {
+.stw-player-marker-container {
     display: flex;
     justify-content: space-between;
 }
@@ -116,7 +116,7 @@
 
 /* Tooltip column 2 */
 
-.stw-tooltip-score-wrapper {
+.stw-tooltip-score-container {
     width: 100%;
     display: flex;
     justify-content: space-around;
@@ -161,7 +161,7 @@
 
 }
 
-.stw-tooltip-comment-wrapper {
+.stw-tooltip-comment-container {
     height: 100%; /* disables scrollbar if there is enough vertical space */
 }
 
@@ -197,7 +197,7 @@
 
 /* Scrollable wrappers in tooltip columns 2 and 3 */
 
-.stw-tooltip-comment-wrapper, .stw-tooltip-description {
+.stw-tooltip-comment-container, .stw-tooltip-description {
     overflow-y: auto; /* y scrolling */
     padding-right: 0.5em; /* padding between this and the scrollbar */
 }
