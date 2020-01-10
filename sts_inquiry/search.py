@@ -62,8 +62,6 @@ def _sort(df, cluster_size: int, form):
     for sortby_field in [form.sortby1, form.sortby2, form.sortby3]:
         if sortby_field.used:
             sort_col, sort_order = sortby_field.data.split("-")
-            if sort_col == "mode_playing_duration":
-                sort_col = "mode_playing_duration_ordinal"
             sort_cols.append(sort_col)
             sort_orders.append(sort_order == "asc")
 

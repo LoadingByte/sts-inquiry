@@ -6,5 +6,3 @@ PLAYING_DURATION_CONVERSION = {
     "Spieldauer: zwischen 30 und 90 Minuten": "30-90 min",
     "Spieldauer: über 90 Minuten": ">90 min"
 }
-
-PLAYING_DURATION_ORDER_ASC = ["<15 min", "<30 min", "30-90 min", ">90 min"]

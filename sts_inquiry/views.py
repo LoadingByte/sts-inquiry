@@ -12,10 +12,12 @@ METRIC_COL_LABELS = {
     "intra_handovers": "#C\U0001F517",
     "nghbr_handovers": "#N\U0001F517",
     "n_neighbors": "#N",
-    "difficulty": "\u2300\U0001F92F",
-    "entertainment": "\u2300\U0001F3A2",
-    "difent": "\u2300\u2300\U0001F92F\U0001F3A2",
-    "mode_playing_duration": "\u2300\u23F3",
+    "mean_difficulty": "\u2300\U0001F92F",
+    "mean_entertainment": "\u2300\U0001F3A2",
+    "mean_difent": "\u2300\u2300\U0001F92F\U0001F3A2",
+    "min_difficulty": "\u2B07\U0001F92F",
+    "min_entertainment": "\u2B07\U0001F3A2",
+    "min_difent": "\u2B07\u2300\U0001F92F\U0001F3A2",
     "nghbr_occupants": "#N\U0001F464",
     "region_occupants": "#R\U0001F464"
 }

@@ -118,6 +118,11 @@
 {% endmacro -%}
 
 
+{%- macro float_or_dash(val) %}
+  {{ "{:.2f}".format(val).replace(".", ",") if not isnan(val) else "&ndash;"|safe }}
+{% endmacro -%}
+
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -205,34 +210,34 @@
     <thead>
     <tr>
       {% set multi = cluster_size > 1 %}
+      {% set deac_style = ' style="color: #aaa"' if not multi %}
+      {% macro th_metric(label, title, deac) %}
+        <th>
+          <abbr title="{{ title ~ (" (bei Clustergröße 1 irrelevant)" if not multi and deac) }}"
+              {{ deac_style|safe if deac }}>
+            {{ metric_col_labels[label] }}
+          </abbr>
+        </th>
+      {% endmacro -%}
+
       <th>Rang</th>
       <th>{{ "Cluster" if multi else "Stellwerk" }}</th>
       <th>Nachbarn</th>
-      <th><abbr title="Direkte Übergabepunkte im Cluster{{ " (immer 0, da Clustergröße 1)" if not multi }}">
-        {{ metric_col_labels["intra_handovers"] }}</abbr></th>
-      <th><abbr title="Direkte Übergabepunkte mit Nachbarstellwerken">
-        {{ metric_col_labels["nghbr_handovers"] }}</abbr></th>
-      <th><abbr title="Nachbarstellwerke">
-        {{ metric_col_labels["n_neighbors"] }}</abbr></th>
-      <th><abbr title="{{ "Durchschnittlicher " if multi }}Schwierigkeitsgrad{{ " im Cluster" if multi }}">
-        {{ metric_col_labels["difficulty"] }}</abbr></th>
-      <th><abbr title="{{ "Durchschnittlicher " if multi }}Unterhaltungsfaktor{{ " im Cluster" if multi }}">
-        {{ metric_col_labels["entertainment"] }}</abbr></th>
-      <th><abbr
-          title="Durchschnitt des {{ "durchschnittlichen " if multi }}Schwierigkeitsgrads und Unterhaltungsfaktors{{ " im Cluster" if multi }}">
-        {{ metric_col_labels["difent"] }}</abbr></th>
-      <th><abbr title="Häufigste Spielzeit der Kommentare{{ " für Stellwerke im Cluster" if multi }}">
-        {{ metric_col_labels["mode_playing_duration"] }}</abbr></th>
+      {{ th_metric("intra_handovers", "Direkte Übergabepunkte im Cluster", true) }}
+      {{ th_metric("nghbr_handovers", "Direkte Übergabepunkte mit Nachbarstellwerken") }}
+      {{ th_metric("n_neighbors", "Nachbarstellwerke") }}
+      {{ th_metric("mean_difficulty", ("Durchschnittlicher " if multi) ~ "Schwierigkeitsgrad" ~ (" im Cluster" if multi)) }}
+      {{ th_metric("mean_entertainment", ("Durchschnittlicher " if multi) ~ "Unterhaltungsfaktor" ~ (" im Cluster" if multi)) }}
+      {{ th_metric("mean_difent", "Durchschnitt " ~ ("der Durchschnitte " if multi) ~ "aus Schwierigkeitsgrad und Unterhaltungsfaktor" ~ (" im Cluster" if multi)) }}
+      {{ th_metric("min_difficulty", "Minimaler Schwierigkeitsgrad im Cluster", true) }}
+      {{ th_metric("min_entertainment", "Minimaler Unterhaltungsfaktor im Cluster", true) }}
+      {{ th_metric("min_difent", "Minimum der Durchschnitte aus Schwierigkeitsgrad und Unterhaltungsfaktor im Cluster", true) }}
       <th><abbr title="Instanzen, die die Suchanfrage am besten erfüllen">1|2</abbr></th>
-      <th><abbr title="Belegte Nachbarstellwerke {{ "in Instanz {}".format(instance) if instance else "pro Instanz" }}">
-        {{ metric_col_labels["nghbr_occupants"] }}</abbr></th>
-      <th><abbr
-          title="{{ 'Maximal b' if multi else 'B' }}elegte andere Stellwerke in {{ ("einer der Regionen des Clusters" if multi else "der Region des Stellwerks") }} {{ ("in Instanz {}".format(instance) if instance else "pro Instanz") }}">
-        {{ metric_col_labels["region_occupants"] }}</abbr></th>
+      {{ th_metric("nghbr_occupants", "Belegte Nachbarstellwerke " ~ ("in Instanz {}".format(instance) if instance else "pro Instanz")) }}
+      {{ th_metric("region_occupants", ("Maximal b" if multi else "B") ~ "elegte andere Stellwerke in " ~ ("einer der Regionen des Clusters " if multi else "der Region des Stellwerks ") ~ ("in Instanz {}".format(instance) if instance else "pro Instanz")) }}
     </tr>
     </thead>
     <tbody>
-
     {%- if cluster_size <= 3 %}
       {% set stw_cont_height = 7 %}
     {% elif cluster_size == 4 %}
@@ -316,13 +321,15 @@
             {% endfor %}
           </div>
         </td>
-        <td>{{ row.intra_handovers }}</td>
+        <td{{ deac_style|safe }}>{{ row.intra_handovers }}</td>
         <td>{{ row.nghbr_handovers }}</td>
         <td>{{ row.n_neighbors }}</td>
-        <td>{{ "{:.2f}".format(row.difficulty) if not isnan(row.difficulty) else "&ndash;"|safe }}</td>
-        <td>{{ "{:.2f}".format(row.entertainment) if not isnan(row.entertainment) else "&ndash;"|safe }}</td>
-        <td>{{ "{:.2f}".format(row.difent) if not isnan(row.difent) else "&ndash;"|safe }}</td>
-        <td>{{ row.mode_playing_duration if row.mode_playing_duration else "&ndash;"|safe }}</td>
+        <td>{{ float_or_dash(row.mean_difficulty) }}</td>
+        <td>{{ float_or_dash(row.mean_entertainment) }}</td>
+        <td>{{ float_or_dash(row.mean_difent) }}</td>
+        <td{{ deac_style|safe }}>{{ float_or_dash(row.min_difficulty) }}</td>
+        <td{{ deac_style|safe }}>{{ float_or_dash(row.min_entertainment) }}</td>
+        <td{{ deac_style|safe }}>{{ float_or_dash(row.min_difent) }}</td>
         <td>{{ row.instance }}</td>
         <td>{{ row.nghbr_occupants }}</td>
         <td>{{ row.region_occupants }}</td>
