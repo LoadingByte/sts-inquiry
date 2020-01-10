@@ -86,20 +86,8 @@ td {
     padding: 1.5em 0.5em;
 }
 
-/* Rank column */
-td:first-child {
-    font-size: 2em;
-    font-weight: bold;
-    color: #aaa;
-}
-
-/* Rank column */
-td:nth-child(1) {
-    padding: 0 0.7em;
-}
-
-/* Cluster column */
-td:nth-child(2) {
+/* Rank and cluster columns */
+td:nth-child(1), td:nth-child(2) {
     padding-left: 1.5em;
     padding-right: 1.5em;
 }
@@ -110,8 +98,8 @@ td:nth-child(3) {
     padding-right: 1em;
 }
 
-/* Every column apart from the cluster one */
-th:not(:nth-child(2)), td:not(:nth-child(2)) {
+/* Center the text in every column apart from the cluster and neighbor ones */
+td:not(:nth-child(2)):not(:nth-child(3)) {
     text-align: center;
 }
 
@@ -125,6 +113,16 @@ tbody tr:not(:first-child) td {
 
 th:not(:first-child), td:not(:first-child) {
     border-left: 2px dashed #ddd;
+}
+
+.highlight-row td {
+    background-color: #e8f5f8 !important;
+}
+
+.cluster-link {
+    font-size: 2em;
+    font-weight: bold;
+    color: #bbb;
 }
 
 .region-container {

@@ -1,4 +1,4 @@
-from typing import Any, Tuple, List, Dict
+from typing import Any, Optional, Tuple, List, Set, Dict
 
 from sts_inquiry import app, cache
 from sts_inquiry.forms import SearchForm
@@ -7,7 +7,7 @@ _ROWS_PER_PAGE = app.config["ROWS_PER_PAGE"]
 _PER_INST_COL_NAMES = ["instance", "nghbr_occupants", "region_occupants"]
 
 
-def search(form: SearchForm, page: int):
+def search(form: SearchForm, page: int, highlight_cluster_aids: Optional[Set[int]]):
     with cache.LOCK:
         # Get the appropriate df for the selected cluster size.
         cluster_size = form.clustersize.data
@@ -26,6 +26,16 @@ def search(form: SearchForm, page: int):
 
         n_total_rows = df_out.shape[0]
 
+        # If the use wants to view a specific cluster, find that cluster and go to the page its on.
+        highlight_row_idx = None
+        if highlight_cluster_aids:
+            try:
+                highlight_row_idx = df_out.index[df_out["aids"] == highlight_cluster_aids][0]
+                page = highlight_row_idx // _ROWS_PER_PAGE + 1
+            except IndexError:
+                # In this case, highlight row idx will remain None.
+                pass
+
         # Limit the amount of results to the current page.
         start_row = (page - 1) * _ROWS_PER_PAGE
         df_out = df_out.iloc[start_row:start_row + _ROWS_PER_PAGE]
@@ -37,7 +47,7 @@ def search(form: SearchForm, page: int):
         # Get the result away from Pandas so that we can release the lock.
         rows = list(df_out.itertuples())
 
-        return cluster_size, n_total_rows, rows
+        return cluster_size, page, highlight_row_idx, n_total_rows, rows
 
 
 def _filter(df, form):

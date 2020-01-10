@@ -268,8 +268,13 @@
     {% endif -%}
 
     {% for row in rows %}
-      <tr>
-        <td>{{ row.Index + 1 }}</td>
+      <tr {{ 'class="highlight-row"'|safe if row.Index == highlight_row_idx }}>
+        <td>
+          <a class="cluster-link" title="Direkter Link zu diesem Cluster"
+             href="{{ url_for("index") ~ "?" ~ urlencode(search_params + [("cluster", row.aids|join("-"))]) }}">
+            {{ row.Index + 1 }}
+          </a>
+        </td>
         <td>
           {% set cluster = row.cluster %}
           {% if cluster_size == 1 %}

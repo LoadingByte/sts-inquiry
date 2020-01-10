@@ -21,6 +21,8 @@ def landscape_metrics(all_clusters: Iterable[Set[FrozenSet[Stw]]]) -> Iterator[p
     log.info(" * Computing landscape metrics for all clusters...")
 
     for clusters in all_clusters:
+        clusters = list(clusters)
+
         col_neighbors = [{nghbr.stw
                           for stw in cluster for nghbr in stw.neighbors
                           if nghbr.stw not in cluster}
@@ -33,8 +35,7 @@ def landscape_metrics(all_clusters: Iterable[Set[FrozenSet[Stw]]]) -> Iterator[p
                         for stw in cluster] for cluster in clusters]
 
         cols = {
-            "cid": range(len(clusters)),
-            "cluster": list(clusters),
+            "cluster": clusters,
             "neighbors": col_neighbors,
             "intra_edges": col_intra_edges,
             "regions": col_regions,
@@ -50,9 +51,11 @@ def landscape_metrics(all_clusters: Iterable[Set[FrozenSet[Stw]]]) -> Iterator[p
             "min_entertainment": [_statistic(min, (stw.entertainment for stw in cluster)) for cluster in clusters],
             "min_difent": [_statistic(min, difents) for difents in col_difents],
 
-            # Used for sorting and filtering
-            "concat_names": ["+++".join(stw.name for stw in cluster) for cluster in clusters],
-            "rids": [{region.rid for region in regions} for regions in col_regions]
+            # Only used for sorting and filtering
+            "cid": range(len(clusters)),
+            "aids": [{stw.aid for stw in cluster} for cluster in clusters],
+            "rids": [{region.rid for region in regions} for regions in col_regions],
+            "concat_names": ["+++".join(stw.name for stw in cluster) for cluster in clusters]
         }
 
         df = pd.DataFrame(cols)

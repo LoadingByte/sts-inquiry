@@ -42,31 +42,42 @@ def index():
     # Add used=True or used=False to each field depending on whether it contains a value that is not the default.
     form.mark_used_fields()
 
-    # If the URL query string contains values for any non-used fields or page=1, remove those by redirecting.
+    # If the URL query string contains values for any non-used fields, page = 1,
+    # or both a page and a highlight cluster, remove redundant values by redirecting.
     # This leads to nice an concise URLs that only contain relevant information.
-    form_fields = {field.name: field for field in form}
     search_params = []
-    page_param = []
+    nav_params = {}
     query_cleansing_necessary = False
+    form_fields = {field.name: field for field in form}
     for key, value in request.args.items(multi=True):
         if key in form_fields and form_fields[key].used:
             search_params.append((key, value))
         elif key == "page" and value != "1":
-            page_param = [("page", value)]
+            nav_params["page"] = value
+        elif key == "cluster":
+            nav_params["cluster"] = value
         else:
             query_cleansing_necessary = True
+    if "page" in nav_params and "cluster" in nav_params:
+        del nav_params["page"]
+        query_cleansing_necessary = True
     if query_cleansing_necessary:
-        return redirect(url_for("index") + "?" + urlencode(search_params + page_param), 302)
+        return redirect(url_for("index") + "?" + urlencode(search_params + list(nav_params.items())), 302)
 
     try:
         page = int(request.args["page"])
     except (KeyError, TypeError):
         page = 1
 
-    cluster_size, n_total_rows, rows = search(form, page)
+    try:
+        highlight_cluster_aids = {int(aid) for aid in request.args["cluster"].split("-")}
+    except (KeyError, TypeError):
+        highlight_cluster_aids = None
 
-    # Catch too high page numbers.
-    if not rows and page != 1:
+    cluster_size, page, highlight_row_idx, n_total_rows, rows = search(form, page, highlight_cluster_aids)
+
+    # Detect too high page numbers or highlight clusters that cannot be found; then, redirect.
+    if (not rows and page != 1) or (highlight_cluster_aids and not highlight_row_idx):
         return redirect(url_for("index") + "?" + urlencode(search_params), 302)
 
     prev_pages = list(range(1, page))
@@ -84,6 +95,7 @@ def index():
                            metric_col_labels=METRIC_COL_LABELS, cluster_size=cluster_size, stw_coords=stw_coords,
                            instance=form.instance.data if form.instance.used else None,
                            rows=rows, n_total_rows=n_total_rows,
+                           highlight_row_idx=highlight_row_idx,
                            search_params=search_params, cur_page=page, prev_pages=prev_pages, next_pages=next_pages)
 
 
