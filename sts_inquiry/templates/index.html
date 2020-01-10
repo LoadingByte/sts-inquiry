@@ -308,13 +308,14 @@
           {% endif %}
           <div class="region-container"
                style="max-width: {{ region_cont_max_width }}em; margin-top: {{ region_cont_margin }}em">
-            (
-            {% for region in row.regions %}
+            (&nbsp;
+            {%- for region in row.regions -%}
               <a href="{{ urljoin(sts_url, "anlagen.php?beta=on#region={}".format(region.rid)) }}" target="_blank">
-                {{ region.name }}</a>
-              {{- "," if not loop.last }}
-            {% endfor %}
-            )
+                {{- region.name -}}
+              </a>
+              {{- ", " if not loop.last -}}
+            {%- endfor -%}
+            &nbsp;)
           </div>
         </td>
         <td>
