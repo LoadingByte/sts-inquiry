@@ -16,7 +16,7 @@ def run_landscape_pipeline() -> Tuple[World, List[pd.DataFrame]]:
 
 
 def run_player_pipeline(world: World, dfs: List[pd.DataFrame], lock: Lock):
-    fetched_players = list(fetch_players())
+    fetched_players = fetch_players()
 
     with lock:
         link_players(world, fetched_players)

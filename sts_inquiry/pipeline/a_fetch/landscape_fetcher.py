@@ -23,7 +23,7 @@ log = logging.getLogger("sts-inquiry")
 
 def fetch_landscape() -> Tuple[List[Region], Set[EdgePrototype], List[StwPrototype]]:
     session = requests.Session()
-    session.headers.update({"User-Agent": _USER_AGENT})
+    session.headers["User-Agent"] = _USER_AGENT
 
     log.info(" * Fetching region rids...")
     rids = set(_fetch_rids(session))

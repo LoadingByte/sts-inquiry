@@ -23,8 +23,8 @@ You can now quickly deploy Sts Inquiry, e.g., using a virtualenv and [Gunicorn](
 
 ## Configure
 
-Although Sts Inquiry already functions without manual configuration, there are cases in which you might want to change the config,
-e.g., if you want to use a different application root.
+Although Sts Inquiry already mostly functions without manual configuration, you probably want to change the config,
+e.g., to supply the account credentials needed for player list retrieval or to change the application root.
 To do that, copy the config file from `sts_inquiry/settings.cfg` to some new place and change the settings there.
 When you start the app in the future, simply supply the path to your new config file
 in the environment variable `STS_INQUIRY_SETTINGS`:
