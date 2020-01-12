@@ -27,8 +27,8 @@ header h1 {
 /* Form */
 
 #form-wrapper {
-    display: table; /* as small as possible */
-    margin: auto; /* center */
+    display: flex;
+    justify-content: center;
 }
 
 form {
@@ -125,12 +125,33 @@ th:not(:first-child), td:not(:first-child) {
     color: #bbb;
 }
 
-.region-container {
-    text-align: center;
-    color: #888;
+.region-wrapper {
+    display: flex;
+    justify-content: center;
 }
 
-.region-container a {
+.region-container {
+    text-align: center;
+    font-size: 0.9em;
+
+    padding: 0 0.6em 0.2em 0.6em;
+    border: solid #ccc;
+    border-width: 0 2px;
+
+    /* @formatter:off */
+    background-image:
+        linear-gradient(#ccc, #ccc),
+        linear-gradient(#ccc, #ccc),
+        linear-gradient(#ccc, #ccc),
+        linear-gradient(#ccc, #ccc);
+    /* @formatter:on */
+
+    background-repeat: no-repeat;
+    background-size: 0.4em 2px;
+    background-position: top left, top right, bottom left, bottom right;
+}
+
+.region-container, .region-container a {
     color: #666;
 }
 
