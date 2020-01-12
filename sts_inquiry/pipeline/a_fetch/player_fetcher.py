@@ -26,9 +26,9 @@ def fetch_players() -> List[PlayerPrototype]:
     global session_id
 
     if not _USERNAME or not _PASSWORD:
-        logging.warning("Retrieving the current player list requires to be logged in. "
-                        "However, the account credentials specified in the settings file are empty. "
-                        "Please fill in valid account credentials.")
+        raise RuntimeError("Retrieving the current player list requires to be logged in. "
+                           "However, the account credentials specified in the settings file are empty. "
+                           "Please fill in valid account credentials.")
 
     session = requests.Session()
     session.headers["User-Agent"] = _USER_AGENT

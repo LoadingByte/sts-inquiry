@@ -37,11 +37,11 @@ def _fetch_and_handle_errors(label, update_fn):
         update_fn()
         log.info("Successfully finished updating the %s cache.", label)
     except Exception as e:
-        log.error("The following exception occurred while updating the %s cache. "
-                  "Will retry when the next cache update is due.", label)
         log.error(" * %s: %s", e.__class__.__name__, e)
         if e.__cause__:
             log.error(" * Caused by %s: %s", e.__cause__.__class__.__name__, e.__cause__)
+        log.error("Failed to update the %s cache because of the preceding exception. "
+                  "Will retry when the next cache update is due.", label)
 
 
 def _update_landscape():
