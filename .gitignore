@@ -1,6 +1,7 @@
 # Custom
 .idea/
 logs/
+/settings.cfg
 
 
 # Byte-compiled / optimized / DLL files
