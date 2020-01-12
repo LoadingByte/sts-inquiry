@@ -1,3 +1,4 @@
+import os
 from urllib.parse import urljoin, urlencode
 
 import numpy as np
@@ -17,8 +18,9 @@ app = Flask(__name__)
 app.config["WTF_CSRF_ENABLED"] = False
 
 # Load config from disk.
-app.config.from_pyfile("settings.cfg", silent=True)
-app.config.from_envvar("STS_INQUIRY_SETTINGS", silent=True)
+app.config.from_pyfile("settings.cfg")
+if "STS_INQUIRY_SETTINGS" in os.environ:
+    app.config.from_envvar("STS_INQUIRY_SETTINGS")
 
 # Setup logging.
 setup_logging(app.config["LOG_DIR"])
