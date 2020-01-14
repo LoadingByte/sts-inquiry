@@ -45,7 +45,7 @@
 {%-macro stw_player_marker(stw, inst) %}
   {% set player = stw.occupant_at(inst) %}
   {% if player %}
-    <div title="{{ player.name }} steuert Instanz {{ inst }} seit ungefähr {{ player.format_playing_duration() }}"
+    <div title="Instanz {{ inst }} seit ungefähr {{ player.format_playing_duration() }} belegt"
          class="stw-player-marker-occupied">{{ player.format_playing_duration(short=True) }}
     </div>
   {% else %}
