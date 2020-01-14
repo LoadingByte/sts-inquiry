@@ -23,6 +23,7 @@ if "STS_INQUIRY_SETTINGS" in os.environ:
     app.config.from_envvar("STS_INQUIRY_SETTINGS")
 
 # Setup logging.
+app.logger.handlers.clear()
 setup_logging(app.config["LOG_DIR"])
 
 # Change the application root if configured.
