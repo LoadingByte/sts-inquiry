@@ -54,6 +54,7 @@ def landscape_metrics(all_clusters: Iterable[Set[FrozenSet[Stw]]]) -> Iterator[p
             # Only used for sorting and filtering
             "cid": range(len(clusters)),
             "aids": [{stw.aid for stw in cluster} for cluster in clusters],
+            "urids": [{region.superregion.urid for region in regions} for regions in col_regions],
             "rids": [{region.rid for region in regions} for regions in col_regions],
             "concat_names": ["+++".join(stw.name for stw in cluster) for cluster in clusters]
         }

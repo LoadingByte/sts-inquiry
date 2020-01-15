@@ -45,7 +45,7 @@
 {%-macro stw_player_marker(stw, inst) %}
   {% set player = stw.occupant_at(inst) %}
   {% if player %}
-    <div title="Instanz {{ inst }} seit ungefähr {{ player.format_playing_duration() }} belegt"
+    <div title="Instanz {{ inst }} ist seit ungefähr {{ player.format_playing_duration() }} belegt"
          class="stw-player-marker-occupied">{{ player.format_playing_duration(short=True) }}
     </div>
   {% else %}
@@ -256,7 +256,7 @@
 
 
     {%- if cluster_size == 1 %}
-      {% set region_cont_max_width = 10 %}
+      {% set region_cont_max_width = 11 %}
     {% else %}
       {% set region_cont_max_width = stw_cont_width %}
     {% endif -%}
@@ -312,7 +312,7 @@
               {%- for region in row.regions -%}
                 <a href="{{ urljoin(sts_url, "anlagen.php?beta=on#region={}".format(region.rid)) }}" target="_blank">
                   {{- region.name -}}
-                </a>
+                </a>&nbsp;<abbr title="{{ region.superregion.name }}">({{ region.superregion.name[0] }})</abbr>
                 {{- ", " if not loop.last -}}
               {%- endfor -%}
             </div>

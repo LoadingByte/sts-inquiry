@@ -22,6 +22,14 @@ METRIC_COL_LABELS = {
     "region_occupants": "#R\U0001F464"
 }
 
+_HARDCODED_STW_COORDS = {
+    2: [(0, 50), (100, 50)],
+    3: [(0, 0), (100, 0), (50, 100)],
+    4: [(0, 0), (100, 0), (100, 100), (0, 100)],
+    5: [(0, 20), (70, 0), (100, 50), (70, 100), (0, 80)],
+    6: [(25, 0), (75, 0), (100, 50), (75, 100), (25, 100), (0, 50)]
+}
+
 _ROWS_PER_PAGE = app.config["ROWS_PER_PAGE"]
 
 
@@ -36,7 +44,7 @@ def index():
         abort(503)
 
     form = create_search_form(request.args,
-                              max_cluster_size=len(cache.dfs), regions=cache.world.regions,
+                              max_cluster_size=len(cache.dfs), superregions=cache.world.superregions,
                               sortable_cols=list(METRIC_COL_LABELS.items()))
 
     # Add used=True or used=False to each field depending on whether it contains a value that is not the default.
@@ -44,25 +52,11 @@ def index():
 
     # If the URL query string contains values for any non-used fields, page = 1,
     # or both a page and a highlight cluster, remove redundant values by redirecting.
+    # Also, if the regions field is split up into multiple params, join them.
     # This leads to nice an concise URLs that only contain relevant information.
-    search_params = []
-    nav_params = {}
-    query_cleansing_necessary = False
-    form_fields = {field.name: field for field in form}
-    for key, value in request.args.items(multi=True):
-        if key in form_fields and form_fields[key].used:
-            search_params.append((key, value))
-        elif key == "page" and value != "1":
-            nav_params["page"] = value
-        elif key == "cluster":
-            nav_params["cluster"] = value
-        else:
-            query_cleansing_necessary = True
-    if "page" in nav_params and "cluster" in nav_params:
-        del nav_params["page"]
-        query_cleansing_necessary = True
+    query_cleansing_necessary, search_params, nav_params = _process_params(form)
     if query_cleansing_necessary:
-        return redirect(url_for("index") + "?" + urlencode(search_params + list(nav_params.items())), 302)
+        return redirect(url_for("index") + "?" + urlencode(search_params + list(nav_params)), 302)
 
     try:
         page = int(request.args["page"])
@@ -99,13 +93,37 @@ def index():
                            search_params=search_params, cur_page=page, prev_pages=prev_pages, next_pages=next_pages)
 
 
-_HARDCODED_STW_COORDS = {
-    2: [(0, 50), (100, 50)],
-    3: [(0, 0), (100, 0), (50, 100)],
-    4: [(0, 0), (100, 0), (100, 100), (0, 100)],
-    5: [(0, 20), (70, 0), (100, 50), (70, 100), (0, 80)],
-    6: [(25, 0), (75, 0), (100, 50), (75, 100), (25, 100), (0, 50)]
-}
+def _process_params(form):
+    search_params = []
+    region_params = []
+    nav_params = {}
+    query_cleansing_necessary = False
+
+    # Read all params sequentially.
+    field_names = {field.name for field in form}
+    for key, value in request.args.items(multi=True):
+        if key == "regions" and form.regions.used:
+            region_params.append(value)
+        elif key in field_names and getattr(form, key).used:
+            search_params.append((key, value))
+        elif key == "page" and value != "1":
+            nav_params["page"] = value
+        elif key == "cluster":
+            nav_params["cluster"] = value
+        else:
+            query_cleansing_necessary = True
+
+    if len(region_params) >= 2:
+        query_cleansing_necessary = True
+        search_params += [("regions", "-".join(region_params))]
+    elif len(region_params) == 1:
+        search_params += [("regions", region_params[0])]
+
+    if "page" in nav_params and "cluster" in nav_params:
+        del nav_params["page"]
+        query_cleansing_necessary = True
+
+    return query_cleansing_necessary, search_params, nav_params.items()
 
 
 def _coordfun(v: float) -> int:

@@ -49,8 +49,39 @@ select {
     width: 100%;
 }
 
-select#regions {
-    height: 100%;
+#regions {
+    max-height: 13em;
+    padding-right: 1em; /* padding between this and the scrollbar */
+    overflow-y: scroll;
+
+    /* Reset default ul styling */
+    margin-bottom: 0;
+    padding-left: 0;
+    list-style-type: none;
+
+    font-size: 0.8em;
+    /* Default color for when checkbox is not checked */
+    color: #4b0000;
+}
+
+/* Note that this selector only affects child lists, not the root list. */
+#regions ul {
+    padding-left: 1.5em;
+    list-style-type: none;
+}
+
+#regions li {
+    margin-top: 0.1em;
+}
+
+#regions input[type=checkbox] {
+    margin: 0 0.5em 0 0;
+    padding: 0;
+    vertical-align: middle;
+}
+
+#regions input[type=checkbox]:checked ~ * {
+    color: #004b00;
 }
 
 /* Pagination and result count notice */
@@ -133,6 +164,7 @@ th:not(:first-child), td:not(:first-child) {
 .region-container {
     text-align: center;
     font-size: 0.9em;
+    color: #999;
 
     padding: 0 0.6em 0.2em 0.6em;
     border: solid #ccc;
@@ -151,7 +183,7 @@ th:not(:first-child), td:not(:first-child) {
     background-position: top left, top right, bottom left, bottom right;
 }
 
-.region-container, .region-container a {
+.region-container a {
     color: #666;
 }
 

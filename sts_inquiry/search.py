@@ -26,7 +26,7 @@ def search(form: SearchForm, page: int, highlight_cluster_aids: Optional[Set[int
 
         n_total_rows = df_out.shape[0]
 
-        # If the use wants to view a specific cluster, find that cluster and go to the page its on.
+        # If the user wants to view a specific cluster, find that cluster and go to the page its on.
         highlight_row_idx = None
         if highlight_cluster_aids:
             try:
@@ -60,16 +60,24 @@ def _filter(df, form):
     if form.name.used:
         df = df[df["concat_names"].str.contains(form.name.data, case=False, regex=False)]
 
-    if form.regions.used:
-        region_filter = set(form.regions.data)  # hopefully, computing this first is better for performance.
-        df = df[[bool(regions_ids.intersection(region_filter)) for regions_ids in df["rids"]]]
+    if form.regions.used and not form.regions.data.all:
+        filter_urids = set(form.regions.data.urids)
+        filter_rids = set(form.regions.data.rids)
+        if filter_urids and filter_rids:
+            mask = [not filter_urids.isdisjoint(urids) or not filter_rids.isdisjoint(rids)
+                    for urids, rids in zip(df["urids"], df["rids"])]
+        elif filter_urids:
+            mask = [not filter_urids.isdisjoint(urids) for urids in df["urids"]]
+        else:
+            mask = [not filter_rids.isdisjoint(rids) for rids in df["rids"]]
+        df = df[mask]
 
     return df
 
 
 def _sort(df, cluster_size: int, form):
     sort_cols, sort_orders = [], []
-    for sortby_field in [form.sortby1, form.sortby2, form.sortby3]:
+    for sortby_field in (form.sortby1, form.sortby2, form.sortby3):
         if sortby_field.used:
             sort_col, sort_order = sortby_field.data.split("-")
             sort_cols.append(sort_col)

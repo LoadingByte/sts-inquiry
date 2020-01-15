@@ -199,5 +199,5 @@
 
 .stw-tooltip-comment-container, .stw-tooltip-description {
     overflow-y: auto; /* y scrolling */
-    padding-right: 0.5em; /* padding between this and the scrollbar */
+    padding-right: 1em; /* padding between this and the scrollbar */
 }

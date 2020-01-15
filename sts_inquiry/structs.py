@@ -9,6 +9,7 @@ from markupsafe import Markup
 
 @dataclass(frozen=True)
 class World:
+    superregions: List[SuperRegion]
     regions: List[Region]
     stws: List[Stw]
     edges: List[Edge]
@@ -36,9 +37,23 @@ class Edge:
 
 
 @dataclass(eq=False)
+class SuperRegion:
+    urid: int
+    name: str
+    regions: List[Region]
+
+    def __eq__(self, other):
+        return isinstance(other, SuperRegion) and self.urid == other.urid
+
+    def __hash__(self):
+        return hash((self.urid,))
+
+
+@dataclass(eq=False)
 class Region:
     rid: int
     name: str
+    superregion: SuperRegion
     stws: List[Stw]
 
     def __eq__(self, other):
