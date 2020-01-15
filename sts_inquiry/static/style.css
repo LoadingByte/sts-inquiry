@@ -123,7 +123,13 @@ td:nth-child(1), td:nth-child(2) {
     padding-right: 1.5em;
 }
 
-/* Neighbors columns */
+/* Cluster column */
+td:nth-child(2) {
+    padding-top: 2em;
+    padding-bottom: 2em;
+}
+
+/* Neighbors column */
 td:nth-child(3) {
     padding-left: 1em;
     padding-right: 1em;
