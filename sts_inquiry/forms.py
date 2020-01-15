@@ -62,6 +62,9 @@ class RegionField(Field):
                     self.data.urids.append(int(value[1:]))
                 elif value.startswith("r"):
                     self.data.rids.append(int(value[1:]))
+                else:
+                    # For legacy URLs
+                    self.data.rids.append(int(value))
         except ValueError:
             # In case of invalid user input, just use default data.
             self.data = self.Data()
