@@ -66,7 +66,7 @@ def _fetch_rids(session: requests.Session) -> Tuple[List[SuperRegionPrototype], 
             superregion_protos.append(SuperRegionPrototype(urid=urid, name=superregion_node.text.strip()))
 
     region_protos = []
-    for region_node in page.xpath("//tr[@class='regionname']")[17:18]:
+    for region_node in page.xpath("//tr[@class='regionname']"):
         region_protos.append(RegionPrototype(
             rid=int(region_node.attrib["rid"]),
             urid=int(region_node.attrib["urid"]),
