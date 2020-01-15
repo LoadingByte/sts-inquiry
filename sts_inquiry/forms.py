@@ -74,7 +74,8 @@ class RegionField(Field):
 class SearchForm(FlaskForm):
     clustersize = SelectField("Clustergröße", coerce=int, default=1)
 
-    name = StringField("Stellwerkname")
+    nameincl = StringField("Stellwerkname enthält")
+    nameexcl = StringField("Stellwerkname enthält nicht")
     regions = RegionField("Regionen")
     instance = SelectField("Instanz", coerce=int, default=-1,
                            choices=[(-1, "-- Alle -- ")] + [(inst, str(inst)) for inst in INSTANCES])
@@ -83,18 +84,19 @@ class SearchForm(FlaskForm):
     sortby1 = SelectField("1. Stufe")
     sortby2 = SelectField("2. Stufe")
     sortby3 = SelectField("3. Stufe")
+    sortby4 = SelectField("4. Stufe")
 
     submit = SubmitField("\U0001F50D\u00A0\u00A0Suchen")
 
     def mark_used_fields(self):
         self.clustersize.used = self.clustersize.validate(self) and self.clustersize.data != 1
         self.instance.used = self.instance.validate(self) and self.instance.data != -1
-        self.name.used = self.name.validate(self) and self.name.data.strip() != ""
+        self.nameincl.used = self.nameincl.validate(self) and self.nameincl.data.strip() != ""
+        self.nameexcl.used = self.nameexcl.validate(self) and self.nameexcl.data.strip() != ""
         self.regions.used = self.regions.validate(self) and (self.regions.data.urids or self.regions.data.rids)
         self.free.used = self.free.validate(self) and self.free.data
-        self.sortby1.used = self.sortby1.validate(self) and self.sortby1.data and self.sortby1.data != "none"
-        self.sortby2.used = self.sortby2.validate(self) and self.sortby2.data and self.sortby2.data != "none"
-        self.sortby3.used = self.sortby3.validate(self) and self.sortby3.data and self.sortby3.data != "none"
+        for sortby in (self.sortby1, self.sortby2, self.sortby3, self.sortby4):
+            sortby.used = sortby.validate(self) and sortby.data and sortby.data != "none"
         self.submit.used = False
 
 
@@ -111,8 +113,7 @@ def create_search_form(args,
     sort_choices = [("none", "-- Keine --")] + \
                    [(f"{col_id}-{ord_id}", f"{col_lbl} ({ord_lbl})")
                     for col_id, col_lbl in sortable_cols for ord_id, ord_lbl in _SORT_ORDERS]
-    form.sortby1.choices = sort_choices
-    form.sortby2.choices = sort_choices
-    form.sortby3.choices = sort_choices
+    for sortby in (form.sortby1, form.sortby2, form.sortby3, form.sortby4):
+        sortby.choices = sort_choices
 
     return form

@@ -155,16 +155,20 @@
             {{ form.clustersize }}
           </div>
           <div class="flex-vert vert-gap-0-2">
-            {{ form.name.label }}
-            {{ form.name }}
+            {{ form.nameincl.label }}
+            {{ form.nameincl(placeholder="z.B. Hbf") }}
+          </div>
+          <div class="flex-vert vert-gap-0-2">
+            {{ form.nameexcl.label }}
+            {{ form.nameexcl(placeholder="z.B. Rbf|Gbf") }}
           </div>
           <div class="flex-hor hor-gap-1">
             {{ form.instance.label }}
             {{ form.instance }}
           </div>
           <div class="flex-hor hor-gap-0-5">
-            {{ form.free() }}
-            {{ form.free.label() }}
+            {{ form.free }}
+            {{ form.free.label }}
           </div>
         </div>
 
@@ -176,18 +180,12 @@
         <div class="flex-vert vert-gap-0-5">
           <div>Sortierung</div>
           <div class="flex-vert vert-gap-0-5">
-            <div class="flex-hor hor-gap-1">
-              {{ form.sortby1.label }}
-              {{ form.sortby1 }}
-            </div>
-            <div class="flex-hor hor-gap-1">
-              {{ form.sortby2.label }}
-              {{ form.sortby2 }}
-            </div>
-            <div class="flex-hor hor-gap-1">
-              {{ form.sortby3.label }}
-              {{ form.sortby3 }}
-            </div>
+            {% for sortby in (form.sortby1, form.sortby2, form.sortby3, form.sortby4) %}
+              <div class="flex-hor hor-gap-1">
+                {{ sortby.label }}
+                {{ sortby }}
+              </div>
+            {% endfor %}
           </div>
         </div>
       </div>

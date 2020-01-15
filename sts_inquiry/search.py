@@ -57,8 +57,10 @@ def _filter(df, form):
     if form.free.used:
         df = df[df["free"]]
 
-    if form.name.used:
-        df = df[df["concat_names"].str.contains(form.name.data, case=False, regex=False)]
+    if form.nameincl.used:
+        df = df[df["concat_names"].str.contains(form.nameincl.data, case=False, regex=True)]
+    if form.nameexcl.used:
+        df = df[~df["concat_names"].str.contains(form.nameexcl.data, case=False, regex=True)]
 
     if form.regions.used and not form.regions.data.all:
         filter_urids = set(form.regions.data.urids)
@@ -77,7 +79,7 @@ def _filter(df, form):
 
 def _sort(df, cluster_size: int, form):
     sort_cols, sort_orders = [], []
-    for sortby_field in (form.sortby1, form.sortby2, form.sortby3):
+    for sortby_field in (form.sortby1, form.sortby2, form.sortby3, form.sortby4):
         if sortby_field.used:
             sort_col, sort_order = sortby_field.data.split("-")
             sort_cols.append(sort_col)

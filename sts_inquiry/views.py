@@ -22,6 +22,12 @@ METRIC_COL_LABELS = {
     "region_occupants": "#R\U0001F464"
 }
 
+_ROWS_PER_PAGE = app.config["ROWS_PER_PAGE"]
+
+_LEGACY_PARAM_KEYS = {
+    "name": "nameincl"
+}
+
 _HARDCODED_STW_COORDS = {
     2: [(0, 50), (100, 50)],
     3: [(0, 0), (100, 0), (50, 100)],
@@ -29,8 +35,6 @@ _HARDCODED_STW_COORDS = {
     5: [(0, 20), (70, 0), (100, 50), (70, 100), (0, 80)],
     6: [(25, 0), (75, 0), (100, 50), (75, 100), (25, 100), (0, 50)]
 }
-
-_ROWS_PER_PAGE = app.config["ROWS_PER_PAGE"]
 
 
 @app.errorhandler(503)
@@ -54,9 +58,9 @@ def index():
     # or both a page and a highlight cluster, remove redundant values by redirecting.
     # Also, if the regions field is split up into multiple params, join them.
     # This leads to nice an concise URLs that only contain relevant information.
-    query_cleansing_necessary, search_params, nav_params = _process_params(form)
+    query_cleansing_necessary, search_params, other_params = _process_params(form)
     if query_cleansing_necessary:
-        return redirect(url_for("index") + "?" + urlencode(search_params + list(nav_params)), 302)
+        return redirect(url_for("index") + "?" + urlencode(search_params + other_params), 302)
 
     try:
         page = int(request.args["page"])
@@ -95,15 +99,17 @@ def index():
 
 def _process_params(form):
     search_params = []
-    region_params = []
+    region_values = []
+
     nav_params = {}
+    legacy_params = []
     query_cleansing_necessary = False
 
     # Read all params sequentially.
     field_names = {field.name for field in form}
     for key, value in request.args.items(multi=True):
         if key == "regions" and form.regions.used:
-            region_params.append(value)
+            region_values.append(value)
         elif key in field_names and getattr(form, key).used:
             search_params.append((key, value))
         elif key == "page" and value != "1":
@@ -112,18 +118,22 @@ def _process_params(form):
             nav_params["cluster"] = value
         else:
             query_cleansing_necessary = True
+            if key in _LEGACY_PARAM_KEYS:
+                legacy_params.append((_LEGACY_PARAM_KEYS[key], value))
 
-    if len(region_params) >= 2:
+    if len(region_values) >= 2:
         query_cleansing_necessary = True
-        search_params += [("regions", "-".join(region_params))]
-    elif len(region_params) == 1:
-        search_params += [("regions", region_params[0])]
+        search_params += [("regions", "-".join(region_values))]
+    elif len(region_values) == 1:
+        search_params += [("regions", region_values[0])]
 
     if "page" in nav_params and "cluster" in nav_params:
         del nav_params["page"]
         query_cleansing_necessary = True
 
-    return query_cleansing_necessary, search_params, nav_params.items()
+    other_params = list(nav_params.items()) + legacy_params
+
+    return query_cleansing_necessary, search_params, other_params
 
 
 def _coordfun(v: float) -> int:

@@ -50,7 +50,7 @@ select {
 }
 
 #regions {
-    max-height: 13em;
+    max-height: 18em;
     padding-right: 1em; /* padding between this and the scrollbar */
     overflow-y: scroll;
 
