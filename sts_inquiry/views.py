@@ -75,7 +75,7 @@ def index():
     cluster_size, page, highlight_row_idx, n_total_rows, rows = search(form, page, highlight_cluster_aids)
 
     # Detect too high page numbers or highlight clusters that cannot be found; then, redirect.
-    if (not rows and page != 1) or (highlight_cluster_aids and not highlight_row_idx):
+    if (not rows and page != 1) or (highlight_cluster_aids and highlight_row_idx is None):
         return redirect(url_for("index") + "?" + urlencode(search_params), 302)
 
     prev_pages = list(range(1, page))
