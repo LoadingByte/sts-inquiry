@@ -22,7 +22,7 @@ window.addEventListener("load", function () {
                 }
 
                 if (mapPlaceholder) {
-                    const url = mapPlaceholder.textContent;
+                    const url = mapPlaceholder.textContent.trim();
                     const iframe = document.createElement("iframe");
                     iframe.setAttribute("src", url);
                     iframe.setAttribute("class", "stw-tooltip-map");
