@@ -81,7 +81,7 @@ select {
 }
 
 #regions input[type=checkbox]:checked ~ * {
-    color: #004b00;
+    color: #006a00;
 }
 
 /* Pagination and result count notice */
