@@ -28,6 +28,11 @@ _LEGACY_PARAM_KEYS = {
     "name": "nameincl"
 }
 
+_LEGACY_PARAM_VALUES = {
+    f"{col}-{order}": f"mean_{col}-{order}"
+    for col in ("difficulty", "entertainment", "difent") for order in ("asc", "desc")
+}
+
 _HARDCODED_STW_COORDS = {
     2: [(0, 50), (100, 50)],
     3: [(0, 0), (100, 0), (50, 100)],
@@ -120,6 +125,8 @@ def _process_params(form):
             query_cleansing_necessary = True
             if key in _LEGACY_PARAM_KEYS:
                 legacy_params.append((_LEGACY_PARAM_KEYS[key], value))
+            elif value in _LEGACY_PARAM_VALUES:
+                legacy_params.append((key, _LEGACY_PARAM_VALUES[value]))
 
     if len(region_values) >= 2:
         query_cleansing_necessary = True
