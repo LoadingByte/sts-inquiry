@@ -173,14 +173,15 @@ def _fetch_comments(session: requests.Session, forum_id: str) -> Iterator[Commen
     page = html.fromstring(resp.content)
 
     # Note: We skip the first comment since it's just saying that this thread is a shoutbox.
-    posts = [(post.xpath("text()"),
-              post.xpath("ancestor::table//b[text()='Verfasst:']/parent::div/text()")[0])
+    posts = [(post.xpath(".//div[@class='content']/text()"),
+              post.xpath(".//p[@class='author']/time/@datetime")[0])
              for post in page.xpath("//div[@class='postbody']")[1:]]
 
     for content, time in posts:
         playing_duration = None
+        content = [c.strip() for c in content if c.strip() != ""]
         if content[-1].startswith("Spieldauer:"):
-            playing_duration = PLAYING_DURATION_CONVERSION[content[-1].strip()]
+            playing_duration = PLAYING_DURATION_CONVERSION[content[-1]]
             content = content[:-1]
         year = int(re.findall(r"\d{4}", time)[0])
         yield Comment(text=" ".join(content), playing_duration=playing_duration, year=year)

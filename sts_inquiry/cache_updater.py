@@ -22,7 +22,9 @@ def _periodic():
         _fetch_and_handle_errors("world", _update_landscape)
     _remaining_player_updates_till_landscape_update -= 1
 
-    _fetch_and_handle_errors("player list", _update_players)
+    # Only try to fetch players if the landscape has successfully been fetched.
+    if hasattr(cache, "world"):
+        _fetch_and_handle_errors("player list", _update_players)
 
     # Schedule the next iteration.
     # We do this AFTER the update(s) so that they have enough time to complete before the next update starts.
@@ -37,9 +39,9 @@ def _fetch_and_handle_errors(label, update_fn):
         update_fn()
         log.info("Successfully finished updating the %s cache.", label)
     except Exception as e:
-        log.error(" * %s: %s", e.__class__.__name__, e)
+        log.exception(" * %s: %s", e.__class__.__name__, e)
         if e.__cause__:
-            log.error(" * Caused by %s: %s", e.__cause__.__class__.__name__, e.__cause__)
+            log.exception(" * Caused by %s: %s", e.__cause__.__class__.__name__, e.__cause__)
         log.error("Failed to update the %s cache because of the preceding exception. "
                   "Will retry when the next cache update is due.", label)
 

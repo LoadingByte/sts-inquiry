@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 import logging
+import time
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Iterator
+from typing import Optional, Iterator
 from urllib.parse import urljoin
 
 import requests
+from lxml import html
 
 from sts_inquiry import app
-
-_SESSION_COOKIE_KEY = "phpbb3_8isz4_sid"
 
 _STS_URL = app.config["STS_URL"]
 _USER_AGENT = app.config["FETCH_USER_AGENT"]
@@ -19,7 +19,8 @@ _PASSWORD = app.config["FETCH_PASSWORD"]
 
 log = logging.getLogger("sts-inquiry")
 
-session_id: str = ""
+session_cookie_key: Optional[str] = None
+session_id = ""
 
 
 def fetch_players() -> List[PlayerPrototype]:
@@ -32,7 +33,8 @@ def fetch_players() -> List[PlayerPrototype]:
 
     session = requests.Session()
     session.headers["User-Agent"] = _USER_AGENT
-    session.cookies[_SESSION_COOKIE_KEY] = session_id
+    if session_cookie_key is not None:
+        session.cookies[session_cookie_key] = session_id
 
     players = list(_try_fetch_players(session))
 
@@ -78,21 +80,43 @@ def _check_logged_in(session: requests.Session) -> bool:
 
 
 def _login(session: requests.Session) -> str:
+    global session_cookie_key
+
     # Remove the session information from the previous request because requests sometimes duplicates cookie keys.
     session.cookies.clear()
 
-    resp = session.post(urljoin(_STS_URL, "forum/ucp.php?mode=login"),
-                        data={
-                            "username": _USERNAME,
-                            "password": _PASSWORD,
-                            "login": "Anmelden"
-                        })
+    login_url = urljoin(_STS_URL, "forum/ucp.php?mode=login")
 
-    if _SESSION_COOKIE_KEY not in resp.cookies:
+    # Request the login form once to get three tokens.
+    resp = session.get(login_url)
+    page = html.fromstring(resp.content)
+    creation_time = page.xpath("//input[@name='creation_time']/@value")[0]
+    form_token = page.xpath("//input[@name='form_token']/@value")[0]
+    sid = page.xpath("//input[@name='sid']/@value")[0]
+
+    # The login doesn't work if the first and second request happen in rapid succession,
+    # so we wait for two seconds.
+    time.sleep(2)
+
+    # Then, we accurately mimic what a browser would send to the login page.
+    session.post(login_url, data={
+        "username": _USERNAME,
+        "password": _PASSWORD,
+        "redirect": ["./ucp.php?mode=login", "index.php"],
+        "creation_time": creation_time,
+        "form_token": form_token,
+        "sid": sid,
+        "login": "Anmelden"
+    })
+
+    if session_cookie_key is None:
+        session_cookie_key = next((k for k in session.cookies.keys() if k.endswith("_sid")), None)
+
+    if session_cookie_key not in session.cookies:
         raise RuntimeError("Tried to log in, but the server didn't answer with a session id. "
-                           "Make sure that the account credentials specified in the settings file is valid.")
+                           "Make sure that the account credentials specified in the settings file are valid.")
     else:
-        return resp.cookies[_SESSION_COOKIE_KEY]
+        return session.cookies[session_cookie_key]
 
 
 @dataclass(frozen=True)
