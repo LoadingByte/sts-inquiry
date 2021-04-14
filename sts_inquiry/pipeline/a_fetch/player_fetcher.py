@@ -76,7 +76,7 @@ def _try_fetch_players(session: requests.Session) -> Iterator[PlayerPrototype]:
 
 
 def _check_logged_in(session: requests.Session) -> bool:
-    return "angemeldet als" in session.get(_STS_URL).text
+    return "Abmelden" in session.get(_STS_URL).text
 
 
 def _login(session: requests.Session) -> str:
