@@ -19,12 +19,13 @@ def _periodic():
 
     if _remaining_player_updates_till_landscape_update == 0:
         _remaining_player_updates_till_landscape_update = _player_updates_per_landscape_update
-        _fetch_and_handle_errors("world", _update_landscape)
-    _remaining_player_updates_till_landscape_update -= 1
+        _fetch_and_handle_errors("world", _update_landscape_and_players)
+    else:
+        # Only try to fetch players if the landscape has successfully been fetched.
+        if hasattr(cache, "world"):
+            _fetch_and_handle_errors("player list", _update_players)
 
-    # Only try to fetch players if the landscape has successfully been fetched.
-    if hasattr(cache, "world"):
-        _fetch_and_handle_errors("player list", _update_players)
+    _remaining_player_updates_till_landscape_update -= 1
 
     # Schedule the next iteration.
     # We do this AFTER the update(s) so that they have enough time to complete before the next update starts.
@@ -46,11 +47,19 @@ def _fetch_and_handle_errors(label, update_fn):
                   "Will retry when the next cache update is due.", label)
 
 
-def _update_landscape():
+def _update_landscape_and_players():
     world, dfs = run_landscape_pipeline()
 
-    with cache.LOCK:
-        cache.update(world, dfs)
+    def update_cache():
+        with cache.LOCK:
+            cache.update(world, dfs)
+
+    try:
+        run_player_pipeline(world, dfs, None)
+        update_cache()
+    except Exception:
+        update_cache()
+        raise
 
 
 def _update_players():
