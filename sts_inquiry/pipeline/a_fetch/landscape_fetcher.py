@@ -107,19 +107,21 @@ def _fetch_region_map(session: requests.Session, rid: int) -> Tuple[List[int], L
 
 def _fetch_stw(session: requests.Session, aid: int) -> StwPrototype:
     resp = session.get(urljoin(_STS_URL, f"anlagen.php?subdata=ajax&m=anlage&aid={aid}"))
-    data = _stw_parse_custom_format(resp.text)
+    data = json.loads(resp.text)
 
-    assert aid == int(data["A"]), f"Stw aid in url {aid} doesn't match returned aid {data['A']}."
+    assert aid == int(data["aid"]), f"Stw aid in url {aid} doesn't match returned aid {data['aid']}."
 
-    rid = int(data["R"])
-    name = data["N"]
+    rid = int(data["rid"])
+    name = data["name"]
+    desc = Markup(data["desc"])
 
     latitude, longitude = None, None
-    if "C" in data:
-        str_lat, str_lon = data["C"].split(":")
-        latitude, longitude = float(str_lat), float(str_lon)
+    if "coords" in data:
+        coords = data["coords"]
+        latitude = float(coords[0])
+        longitude = float(coords[1])
 
-    desc, difficulty, entertainment, forum_id = _stw_parse_desc(data["B"])
+    difficulty, entertainment, forum_id = _stw_parse_voting(data["voting"])
 
     comments = []
     if forum_id:
@@ -131,38 +133,21 @@ def _fetch_stw(session: requests.Session, aid: int) -> StwPrototype:
                         difficulty=difficulty, entertainment=entertainment, comments=comments)
 
 
-def _stw_parse_custom_format(text: str) -> dict:
-    dct = {}
+def _stw_parse_voting(voting: str):
+    voting = html.fromstring(voting)
 
-    key = None
-    for line in text.splitlines():
-        if len(line) >= 2 and line[0].isupper() and line[1] == ":":
-            key = line[0]
-            dct[key] = line[2:]
-        else:
-            dct[key] += line
-
-    return dct
-
-
-def _stw_parse_desc(desc: str):
-    desc = html.fromstring(desc)
-
-    clean_desc = Markup("\n".join(html.tostring(p, encoding="utf-8").decode("utf-8")
-                                  for p in desc.xpath("*[not(self::div)]")))
-
-    dif_and_ent = desc.xpath("div[last()]//b/text()")
+    dif_and_ent = voting.xpath("//b/text()")
     difficulty, entertainment = None, None
     if len(dif_and_ent) == 3:
         difficulty, entertainment = float(dif_and_ent[1]), float(dif_and_ent[2])
 
     # Extract the forum id from the JavaScript function call in the href of the only link in the score box.
     forum_id = None
-    forum_href = desc.xpath("div[last()]//a/@href")
+    forum_href = voting.xpath("//a/@href")
     if len(forum_href) == 1:
         forum_id = re.findall(r"\d+", forum_href[0])[0]
 
-    return clean_desc, difficulty, entertainment, forum_id
+    return difficulty, entertainment, forum_id
 
 
 # ========== COMMENT FORUM FOR SINGLE STW ==========

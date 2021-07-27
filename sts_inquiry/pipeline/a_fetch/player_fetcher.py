@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import time
 from dataclasses import dataclass
@@ -64,15 +65,15 @@ def fetch_players() -> List[PlayerPrototype]:
 
 def _try_fetch_players(session: requests.Session) -> Iterator[PlayerPrototype]:
     resp = session.get(urljoin(_STS_URL, "anlagen.php?subdata=ajax&m=players"))
+    data = json.loads(resp.text)
 
-    for line in resp.text.splitlines():
-        line = line.strip()
-        if line != "":
-            name, _, str_aid, str_inst, _, str_stitz, str_start = line.split(":")
-            aid, instance = int(str_aid), int(str_inst)
-            stitz = bool(int(str_stitz))
-            start_time = datetime.fromtimestamp(int(str_start))
-            yield PlayerPrototype(name=name, stitz=stitz, start_time=start_time, aid=aid, instance=instance)
+    for player in data:
+        name = player["userName"]
+        aid = int(player["aid"])
+        instance = int(player["instanz"]) + 1
+        stitz = bool(player["hasStiTz"])
+        start_time = datetime.fromtimestamp(int(player["startTime"]))
+        yield PlayerPrototype(name=name, stitz=stitz, start_time=start_time, aid=aid, instance=instance)
 
 
 def _check_logged_in(session: requests.Session) -> bool:
