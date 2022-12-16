@@ -2,8 +2,9 @@ from dataclasses import dataclass, field as dfield
 from typing import List
 
 from flask_wtf import FlaskForm
+from markupsafe import Markup
 from wtforms import Field, BooleanField, StringField, SelectField, SubmitField
-from wtforms.widgets import HTMLString, html_params
+from wtforms.widgets import html_params
 
 from sts_inquiry.consts import INSTANCES
 from sts_inquiry.structs import SuperRegion
@@ -40,7 +41,7 @@ class RegionField(Field):
                 html.append("</li>")
             html.append("</ul></li>")
         html.append("</ul></li></ul>")
-        return HTMLString("".join(html))
+        return Markup("".join(html))
 
     superregions: List[SuperRegion]
     data: Data
@@ -91,8 +92,8 @@ class SearchForm(FlaskForm):
     def mark_used_fields(self):
         self.clustersize.used = self.clustersize.validate(self) and self.clustersize.data != 1
         self.instance.used = self.instance.validate(self) and self.instance.data != -1
-        self.nameincl.used = self.nameincl.validate(self) and self.nameincl.data.strip() != ""
-        self.nameexcl.used = self.nameexcl.validate(self) and self.nameexcl.data.strip() != ""
+        self.nameincl.used = self.nameincl.validate(self) and self.nameincl.data and self.nameincl.data.strip() != ""
+        self.nameexcl.used = self.nameexcl.validate(self) and self.nameexcl.data and self.nameexcl.data.strip() != ""
         self.regions.used = self.regions.validate(self) and (self.regions.data.urids or self.regions.data.rids)
         self.free.used = self.free.validate(self) and self.free.data
         for sortby in (self.sortby1, self.sortby2, self.sortby3, self.sortby4):

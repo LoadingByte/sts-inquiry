@@ -88,7 +88,7 @@ def _sort(df, cluster_size: int, form):
     # Also sort the results by name if we're searching for individual stws
     if cluster_size == 1:
         sort_cols.append("concat_names")
-        sort_orders.append("asc")
+        sort_orders.append(True)
 
     if sort_cols:
         # We use mergesort because that is stable and the instance merging later on
