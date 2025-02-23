@@ -17,6 +17,7 @@ _STS_URL = app.config["STS_URL"]
 _USER_AGENT = app.config["FETCH_USER_AGENT"]
 _USERNAME = app.config["FETCH_USERNAME"]
 _PASSWORD = app.config["FETCH_PASSWORD"]
+_TIMEOUT = app.config["FETCH_TIMEOUT"]
 
 log = logging.getLogger("sts-inquiry")
 
@@ -64,7 +65,7 @@ def fetch_players() -> List[PlayerPrototype]:
 
 
 def _try_fetch_players(session: requests.Session) -> Iterator[PlayerPrototype]:
-    resp = session.get(urljoin(_STS_URL, "anlagen.php?subdata=ajax&m=players"))
+    resp = session.get(urljoin(_STS_URL, "anlagen.php?subdata=ajax&m=players"), timeout=_TIMEOUT)
     data = json.loads(resp.text)
 
     for player in data:
@@ -77,7 +78,7 @@ def _try_fetch_players(session: requests.Session) -> Iterator[PlayerPrototype]:
 
 
 def _check_logged_in(session: requests.Session) -> bool:
-    return "Abmelden" in session.get(_STS_URL).text
+    return "Abmelden" in session.get(_STS_URL, timeout=_TIMEOUT).text
 
 
 def _login(session: requests.Session) -> str:
@@ -89,7 +90,7 @@ def _login(session: requests.Session) -> str:
     login_url = urljoin(_STS_URL, "forum/ucp.php?mode=login")
 
     # Request the login form once to get three tokens.
-    resp = session.get(login_url)
+    resp = session.get(login_url, timeout=_TIMEOUT)
     page = html.fromstring(resp.content)
     creation_time = page.xpath("//input[@name='creation_time']/@value")[0]
     form_token = page.xpath("//input[@name='form_token']/@value")[0]
@@ -108,7 +109,7 @@ def _login(session: requests.Session) -> str:
         "form_token": form_token,
         "sid": sid,
         "login": "Anmelden"
-    })
+    }, timeout=_TIMEOUT)
 
     if session_cookie_key is None:
         session_cookie_key = next((k for k in session.cookies.keys() if k.endswith("_sid")), None)

@@ -17,6 +17,7 @@ from sts_inquiry.structs import Comment
 
 _STS_URL = app.config["STS_URL"]
 _USER_AGENT = app.config["FETCH_USER_AGENT"]
+_TIMEOUT = app.config["FETCH_TIMEOUT"]
 
 log = logging.getLogger("sts-inquiry")
 
@@ -55,7 +56,7 @@ def fetch_landscape() -> Tuple[List[SuperRegionPrototype], List[RegionPrototype]
 # ========== MAIN PAGE ==========
 
 def _fetch_rids(session: requests.Session) -> Tuple[List[SuperRegionPrototype], List[RegionPrototype]]:
-    resp = session.get(urljoin(_STS_URL, "anlagen.php"))
+    resp = session.get(urljoin(_STS_URL, "anlagen.php"), timeout=_TIMEOUT)
     page = html.fromstring(resp.content)
 
     superregion_protos = []
@@ -79,7 +80,7 @@ def _fetch_rids(session: requests.Session) -> Tuple[List[SuperRegionPrototype], 
 # ========== REGION MAP JSON ==========
 
 def _fetch_region_map(session: requests.Session, rid: int) -> Tuple[List[int], List[EdgePrototype]]:
-    resp = session.get(urljoin(_STS_URL, f"landschaft-data.php?rid={rid}"))
+    resp = session.get(urljoin(_STS_URL, f"landschaft-data.php?rid={rid}"), timeout=_TIMEOUT)
     data = json.loads(resp.text)
 
     kids_to_aids = {}
@@ -106,7 +107,7 @@ def _fetch_region_map(session: requests.Session, rid: int) -> Tuple[List[int], L
 # ========== SINGLE STW ==========
 
 def _fetch_stw(session: requests.Session, aid: int) -> StwPrototype:
-    resp = session.get(urljoin(_STS_URL, f"anlagen.php?subdata=ajax&m=anlage&aid={aid}"))
+    resp = session.get(urljoin(_STS_URL, f"anlagen.php?subdata=ajax&m=anlage&aid={aid}"), timeout=_TIMEOUT)
     data = json.loads(resp.text)
 
     assert aid == int(data["aid"]), f"Stw aid in url {aid} doesn't match returned aid {data['aid']}."
@@ -154,7 +155,7 @@ def _stw_parse_voting(voting: str):
 
 
 def _fetch_comments(session: requests.Session, forum_id: str) -> Iterator[Comment]:
-    resp = session.get(urljoin(_STS_URL, f"forum/viewtopic.php?t={forum_id}"))
+    resp = session.get(urljoin(_STS_URL, f"forum/viewtopic.php?t={forum_id}"), timeout=_TIMEOUT)
     page = html.fromstring(resp.content)
 
     # Note: We skip the first comment since it's just saying that this thread is a shoutbox.
