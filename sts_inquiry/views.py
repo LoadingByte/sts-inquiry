@@ -69,12 +69,12 @@ def index():
 
     try:
         page = int(request.args["page"])
-    except (KeyError, TypeError):
+    except (KeyError, TypeError, ValueError):
         page = 1
 
     try:
         highlight_cluster_aids = {int(aid) for aid in request.args["cluster"].split("-")}
-    except (KeyError, TypeError):
+    except (KeyError, TypeError, ValueError):
         highlight_cluster_aids = None
 
     cluster_size, page, highlight_row_idx, n_total_rows, rows = search(form, page, highlight_cluster_aids)
